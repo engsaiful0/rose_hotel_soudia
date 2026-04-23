@@ -169,7 +169,7 @@ include 'header.php';
 
                             </div>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-2" style="display: none;">
                             <div class="container-room bg-primary"
                                  style="width: 100%;float: left;margin-right: 5px;padding-top: 15px;height: 80px;margin-top: 5px;">
 
