@@ -13,10 +13,44 @@
             width: 100%;
         }
     }
-    .balance_report_table td,
-    .balance_report_table th {
+    .balance_report_table {
+        border: 2px solid #222 !important;
+        border-collapse: collapse !important;
+    }
+    .balance_report_table thead th,
+    .balance_report_table tbody td {
+        border: 1px solid #222 !important;
         padding: 8px;
-        border: 1px solid #333;
+    }
+    .balance_report_table tbody tr:last-child td {
+        border: 1px solid #222 !important;
+    }
+    @media print {
+        .balance_report_table,
+        .balance_report_table thead th,
+        .balance_report_table tbody td {
+            border: 1px solid #000 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+    }
+    .balance_report_doc_header {
+        width: 1000px;
+        max-width: 100%;
+        margin: 0 auto 16px auto;
+        padding: 12px 16px;
+        border: 2px solid #222;
+        background: #f8f9fa;
+        color: #000;
+        text-align: center;
+    }
+    .balance_report_doc_header .hotel-name {
+        font-size: 1.25rem;
+        font-weight: bold;
+        margin-bottom: 8px;
+    }
+    .balance_report_doc_header .date-range {
+        font-size: 1rem;
     }
 </style>
 <?php
@@ -35,6 +69,16 @@ if (strtotime($from_date) > strtotime($to_date)) {
     echo '<p class="text-danger">' . ($language == 'english' ? 'From date cannot be after to date.' : 'تاريخ البداية لا يمكن أن يكون بعد تاريخ النهاية.') . '</p>';
     return;
 }
+
+$hotel_row = $this->db->where('hotel_id', $hotel_id)->get('hotel')->row();
+$hotel_display_name = $hotel_row
+    ? ($language == 'english' ? $hotel_row->hotel_name_in_english : $hotel_row->hotel_name_in_arabic)
+    : '';
+$range_from_display = date('d/m/Y', strtotime($from_date));
+$range_to_display = date('d/m/Y', strtotime($to_date));
+$date_range_label = $language == 'english'
+    ? ('Date range: ' . $range_from_display . ' — ' . $range_to_display)
+    : ('الفترة: من ' . $range_from_display . ' إلى ' . $range_to_display);
 ?>
 <div class="row">
     <div class="col-md-12">
@@ -42,8 +86,12 @@ if (strtotime($from_date) > strtotime($to_date)) {
     </div>
 </div>
 <div id="balance_report_print_area" class="mt-3">
-    <table class="table table-bordered balance_report_table" style="width: 1000px!important;margin: 0 auto;color:black;border-collapse:collapse;;border-collapse:collapse;">
-        <thead class="bg-primary text-white">
+    <div class="balance_report_doc_header">
+        <div class="hotel-name"><?php echo htmlspecialchars($hotel_display_name, ENT_QUOTES, 'UTF-8'); ?><br> Balance Report</div>
+        <div class="date-range"><?php echo htmlspecialchars($date_range_label, ENT_QUOTES, 'UTF-8'); ?></div>
+    </div>
+    <table class="table balance_report_table" style="width:1000px;max-width:100%;margin:0 auto;color:#000;">
+        <thead >
         <tr>
             <th><?php echo $language == 'english' ? 'Date' : 'التاريخ'; ?></th>
             <th><?php echo $language == 'english' ? 'Total Income(Cash)' : 'إجمالي الدخل (نقدي)'; ?></th>
@@ -114,6 +162,11 @@ if (strtotime($from_date) > strtotime($to_date)) {
 
             $balance = $cash + $credit - $expense;
 
+            $all_zero = (abs($cash) < 0.00001 && abs($credit) < 0.00001 && abs($expense) < 0.00001 && abs($balance) < 0.00001);
+            if ($all_zero) {
+                continue;
+            }
+
             $grand_cash += $cash;
             $grand_credit += $credit;
             $grand_expense += $expense;
@@ -140,13 +193,4 @@ if (strtotime($from_date) > strtotime($to_date)) {
         </tr>
         </tbody>
     </table>
-    <p class="text-muted small mt-2">
-        <?php
-        if ($language == 'english') {
-            echo 'Income (cash/credit) uses check-in rows by data_insert_time from 05:00 on the date until 05:00 the next day (Asia/Riyadh). Late fees use the calendar date. Expenses use the expense date.';
-        } else {
-            echo 'الدخل (نقدي/آجل) حسب وقت الإدخال من 05:00 لذلك اليوم حتى 05:00 اليوم التالي (توقيت الرياض). المتأخرات حسب تاريخ التقويم. المصروفات حسب تاريخ المصروف.';
-        }
-        ?>
-    </p>
 </div>
