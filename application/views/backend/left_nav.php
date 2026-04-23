@@ -256,7 +256,7 @@
                 $user_type = $this->session->userdata('type');
                 if ($user_type == 'superadmin'||$user_type == 'admin') {
                     ?>
-                    <li class=" menu-li"><a style="color:white" href="<?php echo base_url() ?>add-late"><i style="padding-left: 5px"class="fa fa-list"></i>
+                    <li style="display: none;" class=" menu-li"><a style="color:white" href="<?php echo base_url() ?>add-late"><i style="padding-left: 5px"class="fa fa-list"></i>
                             <?php
                             if ($language == 'english') {
                                 ?>
