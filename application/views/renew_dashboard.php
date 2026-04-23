@@ -24,6 +24,7 @@
                 //                                die;
                 foreach ($checkin_details_renews as $checkin_details_renew) {
                     $room_renew = $this->db->where('room_id', $checkin_details_renew->room_id)->get('room')->row();
+                    $renew_due = isset($checkin_details_renew->due) ? (float) $checkin_details_renew->due : 0.0;
                     ?>
                     <div class="container-room"
                          style="background-image: url('<?php base_url()?>assets/renew.jpg');background-repeat: no-repeat;float: left;width: 110px;height: 200px;  ">
@@ -35,6 +36,20 @@
                                     echo  $room_renew->room_no_in_arabic . '</b>';
                                 }
                                 ?></p>
+                            <?php
+                            if ($renew_due > 0) {
+                                ?>
+                                <p style="color: #ffeb3b;text-align: center;font-size: 12px;font-weight: bold;margin: 2px 0 0;line-height: 1.2;"><?php
+                                if ($language == 'english') {
+                                    echo 'Due: ';
+                                } else {
+                                    echo 'مستحق: ';
+                                }
+                                echo $language == 'english' ? $renew_due : Convertnumber2arabic((string) $renew_due);
+                                ?></p>
+                                <?php
+                            }
+                            ?>
                             <?php
                             if ($checkin_details_renew->day_or_month == 'day') {
                                 ?>

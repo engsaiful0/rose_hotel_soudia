@@ -19,6 +19,16 @@
                 $rooms = $this->db->where('status', 'booked')->where('day_or_month', 'month')->where('hotel_id', $hotel->hotel_id)->order_by('room_no_in_english','ASC')->get('room')->result();
                 foreach ($rooms as $room) {
                     $checkin_details_id_for_renew = 0;
+                    $active_due_row = $this->db->select('due')
+                        ->where('checkin_id', $room->checkin_id)
+                        ->where('room_id', $room->room_id)
+                        ->where('exit_status', 'no')
+                        ->where('is_deleted', 0)
+                        ->order_by('checkin_details_id', 'DESC')
+                        ->limit(1)
+                        ->get('checkin_details')
+                        ->row();
+                    $room_due = $active_due_row ? (float) $active_due_row->due : 0.0;
                     ?>
                     <div class="container-room" data-toggle="modal"
                          data-target="#exampleModal<?php echo $room->checkin_id ?>"
@@ -31,6 +41,20 @@
                                     echo $room->room_no_in_arabic . '</b>';
                                 }
                                 ?></p>
+                            <?php
+                            if ($room_due > 0) {
+                                ?>
+                                <p style="color: #ffeb3b;text-align: center;font-size: 12px;font-weight: bold;margin: 2px 0 0;line-height: 1.2;"><?php
+                                if ($language == 'english') {
+                                    echo 'Due: ';
+                                } else {
+                                    echo 'مستحق: ';
+                                }
+                                echo $language == 'english' ? $room_due : Convertnumber2arabic((string) $room_due);
+                                ?></p>
+                                <?php
+                            }
+                            ?>
                         </div>
                         <div style="padding-top: 20px">
 
