@@ -38,6 +38,12 @@ include 'header.php';
     <div class="container-fluid site-width">
         <?php
         $data = date('Y-m-d');
+        // KSA business day: 05:00 today → 05:00 next day (Asia/Riyadh, set in <head>).
+        // Before 05:00 we still attribute totals to the calendar day that started at yesterday 05:00.
+        $today_5am = strtotime(date('Y-m-d') . ' 05:00:00');
+        $business_date = (time() < $today_5am)
+            ? date('Y-m-d', strtotime('-1 day', $today_5am))
+            : date('Y-m-d');
 //        $time = date('i');
 //        print_r($time);
         //die;
@@ -156,12 +162,12 @@ include 'header.php';
                                     $income_cash = $this->db->select_sum('rent', 'amount')
                                         ->where('cash_or_credit', 'cash')
                                         ->where('hotel_id', $hotel->hotel_id)
-                                        ->where('dateOfEntry', date('y-m-d'))
+                                        ->where('dateOfEntry', $business_date)
                                         ->where('is_deleted', 0)->get('checkin_details')->result();
 
                                     $late = $this->db->select_sum('amount', 'amount')
                                         ->where('hotel_id', $hotel->hotel_id)
-                                        ->where('date', date('y-m-d'))
+                                        ->where('date', $business_date)
                                        ->get('late')->result();
                                     ?>
                                     <p style="text-align: center;color: white"><?php echo $income_cash[0]->amount+$late[0]->amount; ?></p>
@@ -184,7 +190,7 @@ include 'header.php';
                                     <?php
                                     $late = $this->db->select_sum('amount', 'amount')
                                         ->where('hotel_id', $hotel->hotel_id)
-                                        ->where('date', date('y-m-d'))
+                                        ->where('date', $business_date)
                                         ->get('late')->result();
                                     ?>
                                     <p style="text-align: center;color: white"><?php echo $late[0]->amount; ?></p>
@@ -208,7 +214,7 @@ include 'header.php';
                                     $income_credit = $this->db->select_sum('rent', 'amount')
                                         ->where('cash_or_credit', 'credit')
                                         ->where('hotel_id', $hotel->hotel_id)
-                                        ->where('dateOfEntry', date('y-m-d'))
+                                        ->where('dateOfEntry', $business_date)
                                         ->where('is_deleted', 0)->get('checkin_details')->result();
                                     ?>
                                     <p style="text-align: center;color: white"><?php echo $income_credit[0]->amount; ?></p>
@@ -230,7 +236,7 @@ include 'header.php';
                                     <?php
                                     $expense = $this->db->select_sum('amount', 'amount')
                                         ->where('hotel_id', $hotel->hotel_id)
-                                        ->where('date', date('y-m-d'))
+                                        ->where('date', $business_date)
                                         ->get('expense')->result();
                                     ?>
                                     <p style="text-align: center;color: white"><?php echo $expense[0]->amount; ?></p>

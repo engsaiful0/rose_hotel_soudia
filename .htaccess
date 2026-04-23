@@ -1,11 +1,11 @@
 <IfModule mod_rewrite.c>
 RewriteEngine On
+# Block common automated probes (bots hammer shared hosts; never let these hit PHP)
+RewriteRule ^(\.env|\.git|\.svn|\.htpasswd|composer\.lock|package-lock\.json)$ - [F,L,NC]
+RewriteRule ^(wp-login\.php|wp-admin/|xmlrpc\.php|wp-config\.php)$ - [F,L,NC]
+RewriteRule ^(phpmyadmin|pma|myadmin|mysql)(/|$) - [F,L,NC]
 # Do not set RewriteBase to "/": in a subdirectory (e.g. /rose_latest/) that makes
 # rewrites resolve to the document root and breaks base_url / POST targets.
-RewriteCond %{REQUEST_URI} ^system.*
-RewriteRule ^(.*)$ index.php?/$1 [L]
-RewriteCond %{REQUEST_URI} ^application.*
-RewriteRule ^(.*)$ index.php?/$1 [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php?/$1 [L]
