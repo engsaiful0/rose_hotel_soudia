@@ -95,9 +95,9 @@ $date_range_label = $language == 'english'
         <tr>
             <th><?php echo $language == 'english' ? 'Date' : 'التاريخ'; ?></th>
             <th><?php echo $language == 'english' ? 'Total Income(Cash)' : 'إجمالي الدخل (نقدي)'; ?></th>
-            <th><?php echo $language == 'english' ? 'Total Income(Credit)' : 'إجمالي الدخل (آجل)'; ?></th>
+            <th><?php echo $language == 'english' ? 'Total Income(Credit)' : 'إجمالي الدخل (الائتماني)'; ?></th>
             <th><?php echo $language == 'english' ? 'Total Expense' : 'إجمالي المصروف'; ?></th>
-            <th><?php echo $language == 'english' ? 'Description(Expense)' : 'وصف المصروف'; ?></th>
+            <th><?php echo $language == 'english' ? 'Description(Expense)' :'الوصف (المصروفات)'; ?></th>
             <th><?php echo $language == 'english' ? 'Balance' : 'الرصيد'; ?></th>
         </tr>
         </thead>
