@@ -1,3 +1,6 @@
 /vendor
 
 /assets
+/application/cache
+/application/logs
+/application/sessions
