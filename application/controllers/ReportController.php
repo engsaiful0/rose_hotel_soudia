@@ -40,6 +40,28 @@ class ReportController extends CI_Controller
         $data['flag'] = '';
         $this->load->view('admin_content', $data);
     }
+
+    public function balance_report_load()
+    {
+        date_default_timezone_set('Asia/Riyadh');
+        $data = array();
+        $from_date = '';
+        $to_date = '';
+        if (!empty($_POST['from_date'])) {
+            $from_date = date('Y-m-d', strtotime($_POST['from_date']));
+        }
+        if (!empty($_POST['to_date'])) {
+            $to_date = date('Y-m-d', strtotime($_POST['to_date']));
+        }
+        $hotel_id = isset($_POST['hotel_id']) ? $_POST['hotel_id'] : '';
+        if ($this->session->userdata('type') != 'superadmin') {
+            $hotel_id = $this->session->userdata('hotel_id');
+        }
+        $data['hotel_id'] = $hotel_id;
+        $data['from_date'] = $from_date;
+        $data['to_date'] = $to_date;
+        $this->load->view('report/balance_report_load', $data);
+    }
     public function monthly_checkinday_report_load()
     {
         $data = array();
