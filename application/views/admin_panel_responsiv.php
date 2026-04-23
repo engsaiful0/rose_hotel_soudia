@@ -44,7 +44,7 @@ include 'header.php';
         $business_date = (time() < $today_5am)
             ? date('Y-m-d', strtotime('-1 day', $today_5am))
             : date('Y-m-d');
-        // Total Income (Cash): checkin rows by data_insert_time in [business_date 05:00, next day 05:00)
+        // Total Income (Cash/Credit): checkin rows by data_insert_time in [business_date 05:00, next day 05:00)
         $cash_window_start = $business_date . ' 05:00:00';
         $cash_window_end = date('Y-m-d 05:00:00', strtotime($business_date . ' +1 day'));
 //        $time = date('i');
@@ -219,8 +219,10 @@ include 'header.php';
                                     $income_credit = $this->db->select_sum('rent', 'amount')
                                         ->where('cash_or_credit', 'credit')
                                         ->where('hotel_id', $hotel->hotel_id)
-                                        ->where('dateOfEntry', $business_date)
-                                        ->where('is_deleted', 0)->get('checkin_details')->result();
+                                        ->where('is_deleted', 0)
+                                        ->where('data_insert_time >=', $cash_window_start)
+                                        ->where('data_insert_time <', $cash_window_end)
+                                        ->get('checkin_details')->result();
                                     ?>
                                     <p style="text-align: center;color: white"><?php echo $income_credit[0]->amount; ?></p>
                                 </div>

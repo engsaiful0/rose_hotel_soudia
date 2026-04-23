@@ -34,6 +34,12 @@ class ReportController extends CI_Controller
         $data['flag'] = '';
         $this->load->view('admin_content', $data);
     }
+    public function balance_report()
+    {
+        $data['output_content'] = $this->load->view('report/balance_report', '', true);
+        $data['flag'] = '';
+        $this->load->view('admin_content', $data);
+    }
     public function monthly_checkinday_report_load()
     {
         $data = array();
