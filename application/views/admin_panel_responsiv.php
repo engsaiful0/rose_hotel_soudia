@@ -44,6 +44,19 @@ include 'header.php';
         $business_date = (time() < $today_5am)
             ? date('Y-m-d', strtotime('-1 day', $today_5am))
             : date('Y-m-d');
+        // Same KSA window as datetime range for checkin.data_insert_time (Total Income Cash).
+        $tz_riyadh = new DateTimeZone('Asia/Riyadh');
+        $now_riyadh = new DateTime('now', $tz_riyadh);
+        $today_at_5 = DateTime::createFromFormat('!Y-m-d H:i:s', $now_riyadh->format('Y-m-d') . ' 05:00:00', $tz_riyadh);
+        if ($now_riyadh < $today_at_5) {
+            $income_cash_window_start = (clone $today_at_5)->modify('-1 day');
+            $income_cash_window_end = $today_at_5;
+        } else {
+            $income_cash_window_start = $today_at_5;
+            $income_cash_window_end = (clone $today_at_5)->modify('+1 day');
+        }
+        $income_cash_window_start_str = $income_cash_window_start->format('Y-m-d H:i:s');
+        $income_cash_window_end_str = $income_cash_window_end->format('Y-m-d H:i:s');
 //        $time = date('i');
 //        print_r($time);
         //die;
@@ -241,7 +254,6 @@ include 'header.php';
                                     ?>
                                     <p style="text-align: center;color: white"><?php echo $expense[0]->amount; ?></p>
                                 </div>
-
                             </div>
                         </div>
                         <div class="col-md-2">
