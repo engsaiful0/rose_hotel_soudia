@@ -104,6 +104,7 @@ $route['checkinday-report'] = 'ReportController/checkinday_report';
 $route['checkinmonth-report'] = 'ReportController/checkinmonth_report';
 $route['credit-report'] = 'ReportController/credit_report';
 $route['monthly-checkinday-report'] = 'ReportController/monthly_checkinday_report';
+$route['balance-report'] = 'ReportController/balance_report';
 
 
 

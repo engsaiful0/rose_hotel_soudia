@@ -290,6 +290,18 @@
                             ?>
                         </a>
                         <ul class="sub-menu">
+                        <li><a style="color:white" href="<?php echo base_url() ?>balance-report"><i style="padding-left: 5px"class="fa fa-list"></i>
+                                    <?php
+                                    if ($language == 'english') {
+                                        ?>
+                                    Balance Report
+                                        <?php
+                                    } else {
+                                       ?>تقرير الرصيد
+                                       <?php
+                                    }
+                                    ?>
+                                </a></li>
                         <li><a style="color:white" href="<?php echo base_url() ?>transaction-report"><i style="padding-left: 5px"class="fa fa-list"></i>
                                     <?php
                                     if ($language == 'english') {

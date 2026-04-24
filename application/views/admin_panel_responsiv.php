@@ -44,19 +44,9 @@ include 'header.php';
         $business_date = (time() < $today_5am)
             ? date('Y-m-d', strtotime('-1 day', $today_5am))
             : date('Y-m-d');
-        // Same KSA window as datetime range for checkin.data_insert_time (Total Income Cash).
-        $tz_riyadh = new DateTimeZone('Asia/Riyadh');
-        $now_riyadh = new DateTime('now', $tz_riyadh);
-        $today_at_5 = DateTime::createFromFormat('!Y-m-d H:i:s', $now_riyadh->format('Y-m-d') . ' 05:00:00', $tz_riyadh);
-        if ($now_riyadh < $today_at_5) {
-            $income_cash_window_start = (clone $today_at_5)->modify('-1 day');
-            $income_cash_window_end = $today_at_5;
-        } else {
-            $income_cash_window_start = $today_at_5;
-            $income_cash_window_end = (clone $today_at_5)->modify('+1 day');
-        }
-        $income_cash_window_start_str = $income_cash_window_start->format('Y-m-d H:i:s');
-        $income_cash_window_end_str = $income_cash_window_end->format('Y-m-d H:i:s');
+        // Total Income (Cash/Credit): checkin rows by data_insert_time in [business_date 05:00, next day 05:00)
+        $cash_window_start = $business_date . ' 05:00:00';
+        $cash_window_end = date('Y-m-d 05:00:00', strtotime($business_date . ' +1 day'));
 //        $time = date('i');
 //        print_r($time);
         //die;
@@ -175,8 +165,10 @@ include 'header.php';
                                     $income_cash = $this->db->select_sum('rent', 'amount')
                                         ->where('cash_or_credit', 'cash')
                                         ->where('hotel_id', $hotel->hotel_id)
-                                        ->where('dateOfEntry', $business_date)
-                                        ->where('is_deleted', 0)->get('checkin_details')->result();
+                                        ->where('is_deleted', 0)
+                                        ->where('data_insert_time >=', $cash_window_start)
+                                        ->where('data_insert_time <', $cash_window_end)
+                                        ->get('checkin_details')->result();
 
                                     $late = $this->db->select_sum('amount', 'amount')
                                         ->where('hotel_id', $hotel->hotel_id)
@@ -227,8 +219,10 @@ include 'header.php';
                                     $income_credit = $this->db->select_sum('rent', 'amount')
                                         ->where('cash_or_credit', 'credit')
                                         ->where('hotel_id', $hotel->hotel_id)
-                                        ->where('dateOfEntry', $business_date)
-                                        ->where('is_deleted', 0)->get('checkin_details')->result();
+                                        ->where('is_deleted', 0)
+                                        ->where('data_insert_time >=', $cash_window_start)
+                                        ->where('data_insert_time <', $cash_window_end)
+                                        ->get('checkin_details')->result();
                                     ?>
                                     <p style="text-align: center;color: white"><?php echo $income_credit[0]->amount; ?></p>
                                 </div>
