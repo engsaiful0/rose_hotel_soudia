@@ -45,10 +45,10 @@
                             if ($room_due > 0) {
                                 ?>
                                 <p style="color: #ffeb3b;text-align: center;font-size: 12px;font-weight: bold;margin: 2px 0 0;line-height: 1.2;"><?php
-                                if ($language == 'english') {
+                                  if ($language == 'english') {
                                     echo 'Due: ';
                                 } else {
-                                    echo 'مستحق: ';
+                                    echo 'حق:';
                                 }
                                 echo $language == 'english' ? $room_due : Convertnumber2arabic((string) $room_due);
                                 ?></p>

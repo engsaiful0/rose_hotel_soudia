@@ -28,8 +28,8 @@
                     ?>
                     <div class="container-room"
                          style="background-image: url('<?php base_url()?>assets/renew.jpg');background-repeat: no-repeat;float: left;width: 110px;height: 200px;  ">
-                        <div style="padding-top: 45px;padding-right: 20px;">
-                        <span style="font-size: 12px;color: yellow;padding-left: 10px;">Rent: <?php echo $checkin_details_renew->rent; ?></span>
+                        <div style="padding-top: 64px;padding-right: 20px;">
+                       
                             <p style="color: white;text-align: center;font-size: 15px;"><?php
                                 if ($language == 'english') {
                                     echo $room_renew->room_no_in_english . '</b>';
@@ -44,7 +44,7 @@
                                 if ($language == 'english') {
                                     echo 'Due: ';
                                 } else {
-                                    echo 'مستحق: ';
+                                    echo 'حق:';
                                 }
                                 echo $language == 'english' ? $renew_due : Convertnumber2arabic((string) $renew_due);
                                 ?></p>
@@ -72,13 +72,9 @@
                                 <a style="width: 100%;font-weight: bold;color: red;padding-left: 35px;" title="Details"
                                    href="<?php echo base_url() ?>renew-month/<?php echo $checkin_details_renew->checkin_details_id ?>"><?php
                                     if ($language == 'english') {
-                                        ?>
-                                        Renew
-                                        <?php
+                                      echo $checkin_details_renew->rent;
                                     } else {
-                                        ?>
-                                        تجديد
-                                        <?php
+                                        echo $checkin_details_renew->rent; 
                                     }
                                     ?></a>
                                 <?php
