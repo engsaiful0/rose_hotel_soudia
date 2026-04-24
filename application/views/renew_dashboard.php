@@ -28,7 +28,8 @@
                     ?>
                     <div class="container-room"
                          style="background-image: url('<?php base_url()?>assets/renew.jpg');background-repeat: no-repeat;float: left;width: 110px;height: 200px;  ">
-                        <div style="padding-top: 64px;padding-right: 20px;">
+                        <div style="padding-top: 45px;padding-right: 20px;">
+                        <span style="font-size: 12px;color: yellow;padding-left: 10px;">Rent: <?php echo $checkin_details_renew->rent; ?></span>
                             <p style="color: white;text-align: center;font-size: 15px;"><?php
                                 if ($language == 'english') {
                                     echo $room_renew->room_no_in_english . '</b>';
