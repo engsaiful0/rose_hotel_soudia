@@ -129,7 +129,16 @@
                                                                 }
                                         ?></label>
                                     <select id="hotel_id" name="hotel_id" class="form-control">
-                                        <option value="">
+                                        <?php
+                                        $session_hotel_id = $this->session->userdata('hotel_id');
+                                        $user_type = $this->session->userdata('type');
+                                        if ($user_type == 'superadmin') {
+                                            $hotels = $this->db->select('*')->get('hotel')->result();
+                                        } else {
+                                            $hotels = $this->db->where('hotel_id', $session_hotel_id)->get('hotel')->result();
+                                        }
+                                        ?>
+                                        <option value="" disabled="">
                                             <?php
                                             if ($language == 'english') {
                                                 echo "Hotel";
@@ -139,13 +148,10 @@
                                             ?>
                                         </option>
                                         <?php
-                                        $language = $this->session->userdata('language');
-                                        $hotels = $this->db->select('*')->get('hotel')->result();
-
                                         foreach ($hotels as $hotel) {
                                         ?>
                                             <option value="<?php echo $hotel->hotel_id; ?>"
-                                                <?php echo ($expense->hotel_id == $hotel->hotel_id) ? "selected" : ""; ?>>
+                                                <?php echo ((int) $expense->hotel_id === (int) $hotel->hotel_id) ? 'selected' : ''; ?>>
                                                 <?php echo $hotel->hotel_name_in_english; ?>
                                             </option>
                                         <?php

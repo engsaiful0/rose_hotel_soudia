@@ -125,7 +125,16 @@
                                 }
                                 ?></label>
                                     <select id="hotel_id" name="hotel_id" class="form-control">
-                                        <option selected="" value="">
+                                        <?php
+                                        $session_hotel_id = $this->session->userdata('hotel_id');
+                                        $user_type = $this->session->userdata('type');
+                                        if ($user_type == 'superadmin') {
+                                            $hotels = $this->db->select('*')->get('hotel')->result();
+                                        } else {
+                                            $hotels = $this->db->where('hotel_id', $session_hotel_id)->get('hotel')->result();
+                                        }
+                                        ?>
+                                        <option value="" disabled="" <?php echo ($user_type == 'superadmin') ? 'selected=""' : ''; ?>>
                                             <?php
                                             if ($language == 'english') {
                                             ?>
@@ -139,12 +148,10 @@
                                             ?>
                                         </option>
                                         <?php
-                                        $language = $this->session->userdata('language');
-                                        $hotels = $this->db->select('*')->get('hotel')->result();
-
                                         foreach ($hotels as $hotel) {
+                                            $is_selected = ($user_type != 'superadmin' && (int) $hotel->hotel_id === (int) $session_hotel_id);
                                         ?>
-                                            <option value="<?php echo $hotel->hotel_id ?>"><?php echo $hotel->hotel_name_in_english ?></option>
+                                            <option value="<?php echo $hotel->hotel_id ?>"<?php echo $is_selected ? ' selected' : ''; ?>><?php echo $hotel->hotel_name_in_english ?></option>
                                         <?php
                                         }
                                         ?>
