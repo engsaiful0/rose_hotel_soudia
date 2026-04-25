@@ -970,11 +970,16 @@ class CheckinController extends CI_Controller
     public function add_check_in_save()
     {
         $data = array();
-        $exist = $this->db->where('uniquid', $this->input->get('uniquid'))
+        $is_ajax = $this->input->is_ajax_request();
+        $request_value = function ($key) {
+            $value = $this->input->post($key);
+            return $value !== null ? $value : $this->input->get($key);
+        };
+        $exist = $this->db->where('uniquid', $request_value('uniquid'))
             ->get('checkin')->result();
         if (count($exist) == 0) {
-            $guest_unique_id = $this->input->get('guest_unique_id');
-            $guest_type = $this->input->get('guest_type');
+            $guest_unique_id = $request_value('guest_unique_id');
+            $guest_type = $request_value('guest_type');
             if ($guest_type == 'new') {
                 $data = array(
                     'guest_unique_id' => $guest_unique_id,
@@ -985,86 +990,86 @@ class CheckinController extends CI_Controller
 
 
             $data = array(
-                'guest_name' => $this->input->get('guest_name'),
-                'day_or_month' => $this->input->get('day_or_month'),
-                'uniquid' => $this->input->get('uniquid'),
-                'guest_unique_id' => $this->input->get('guest_unique_id'),
-                'country_id' => $this->input->get('country_id'),
-                'place' => $this->input->get('place'),
-                'date_of_birth' => date('Y-m-d', strtotime($this->input->get('date_of_birth'))),
-                'mobile' => $this->input->get('mobile'),
-                'entry_time' => $this->input->get('entry_time'),
-                'entry_date' => $this->input->get('entry_date'),
+                'guest_name' => $request_value('guest_name'),
+                'day_or_month' => $request_value('day_or_month'),
+                'uniquid' => $request_value('uniquid'),
+                'guest_unique_id' => $request_value('guest_unique_id'),
+                'country_id' => $request_value('country_id'),
+                'place' => $request_value('place'),
+                'date_of_birth' => date('Y-m-d', strtotime($request_value('date_of_birth'))),
+                'mobile' => $request_value('mobile'),
+                'entry_time' => $request_value('entry_time'),
+                'entry_date' => $request_value('entry_date'),
                 'data_insert_time' => date('Y-m-d H:i:s'),
                 
-                'profession_id' => $this->input->get('profession_id'),
-                'grandRent' => $this->input->get('grandRent'),
+                'profession_id' => $request_value('profession_id'),
+                'grandRent' => $request_value('grandRent'),
                 'user_id' => $this->session->userdata('user_id'),
                 'hotel_id' => $this->session->userdata('hotel_id'),
 
             );
-            $day_or_month_or_year = $this->input->get('day_or_month_or_year');
-            $room_id = $this->input->get('room_id');
-            $dateOfEntry = $this->input->get('dateOfEntry');
-            $dateOfExit = $this->input->get('dateOfExit');
-            $rent = $this->input->get('rent');
-            $insurance = $this->input->get('insurance');
-            $cash_or_credit = $this->input->get('cash_or_credit');
-            $account_number = $this->input->get('account_number');
-            $due = $this->input->get('due');
+            $day_or_month_or_year = $request_value('day_or_month_or_year');
+            $room_id = $request_value('room_id');
+            $dateOfEntry = $request_value('dateOfEntry');
+            $dateOfExit = $request_value('dateOfExit');
+            $rent = $request_value('rent');
+            $insurance = $request_value('insurance');
+            $cash_or_credit = $request_value('cash_or_credit');
+            $account_number = $request_value('account_number');
+            $due = $request_value('due');
 
             $insert_result = $this->db->insert('checkin', $data);
             $insert_id = $this->db->insert_id();
 
             // Update guest information in all checkin records with the same guest_unique_id
             $guest_update_data = array(
-                'guest_name' => $this->input->get('guest_name'),
-                'mobile' => $this->input->get('mobile'),
-                'profession_id' => $this->input->get('profession_id'),
-                'place' => $this->input->get('place'),
+                'guest_name' => $request_value('guest_name'),
+                'mobile' => $request_value('mobile'),
+                'profession_id' => $request_value('profession_id'),
+                'place' => $request_value('place'),
             );
-            $this->db->where('guest_unique_id', $this->input->get('guest_unique_id'))
+            $this->db->where('guest_unique_id', $request_value('guest_unique_id'))
                      ->update('checkin', $guest_update_data);
 
             $image_1 = '';
-            if ($this->input->get('image_1_name') != '') {
-                $image_1 = $this->input->get('image_1_name');
+            if ($request_value('image_1_name') != '') {
+                $image_1 = $request_value('image_1_name');
             }
             $image_2 = '';
-            if ($this->input->get('image_2_name') != '') {
-                $image_2 = $this->input->get('image_2_name');
+            if ($request_value('image_2_name') != '') {
+                $image_2 = $request_value('image_2_name');
             }
             $image_3 = '';
-            if ($this->input->get('image_3_name') != '') {
-                $image_3 = $this->input->get('image_3_name');
+            if ($request_value('image_3_name') != '') {
+                $image_3 = $request_value('image_3_name');
             }
             $image_4 = '';
-            if ($this->input->get('image_4_name') != '') {
-                $image_4 = $this->input->get('image_4_name');
+            if ($request_value('image_4_name') != '') {
+                $image_4 = $request_value('image_4_name');
             }
             $image_5 = '';
-            if ($this->input->get('image_5_name') != '') {
-                $image_5 = $this->input->get('image_5_name');
+            if ($request_value('image_5_name') != '') {
+                $image_5 = $request_value('image_5_name');
             }
             $image_6 = '';
-            if ($this->input->get('image_6_name') != '') {
-                $image_6 = $this->input->get('image_6_name');
+            if ($request_value('image_6_name') != '') {
+                $image_6 = $request_value('image_6_name');
             }
             $image_7 = '';
-            if ($this->input->get('image_7_name') != '') {
-                $image_7 = $this->input->get('image_7_name');
+            if ($request_value('image_7_name') != '') {
+                $image_7 = $request_value('image_7_name');
             }
             $image_8 = '';
-            if ($this->input->get('image_8_name') != '') {
-                $image_8 = $this->input->get('image_8_name');
+            if ($request_value('image_8_name') != '') {
+                $image_8 = $request_value('image_8_name');
             }
             $image_9 = '';
-            if ($this->input->get('image_9_name') != '') {
-                $image_9 = $this->input->get('image_9_name');
+            if ($request_value('image_9_name') != '') {
+                $image_9 = $request_value('image_9_name');
             }
             $image_10 = '';
-            if ($this->input->get('image_10_name') != '') {
-                $image_10 = $this->input->get('image_10_name');
+            if ($request_value('image_10_name') != '') {
+                $image_10 = $request_value('image_10_name');
             }
 
             $image = '';
@@ -1119,10 +1124,26 @@ class CheckinController extends CI_Controller
             );
             $this->session->set_userdata($sdata);
 
+            if ($is_ajax) {
+                echo json_encode(array(
+                    'status' => 'success',
+                    'message' => 'Data has been saved successfully',
+                    'redirect_url' => base_url('print-check-in/' . $insert_id),
+                ));
+                return;
+            }
+
             $data['checkin_id'] = $insert_id;
             $data['output_content'] = $this->load->view('checkin/print_checkin', $data, true);
             $this->load->view('admin_content', $data);
         } else {
+            if ($is_ajax) {
+                echo json_encode(array(
+                    'status' => 'duplicate',
+                    'message' => 'This data has already been saved.',
+                ));
+                return;
+            }
             $data['output_content'] = $this->load->view('checkin/print_checkin', $data, true);
             $this->load->view('admin_content', $data);
         }
@@ -1131,11 +1152,16 @@ class CheckinController extends CI_Controller
     public function add_check_in_save_month()
     {
         $data = array();
-        $exist = $this->db->where('uniquid', $this->input->get('uniquid'))
+        $is_ajax = $this->input->is_ajax_request();
+        $request_value = function ($key) {
+            $value = $this->input->post($key);
+            return $value !== null ? $value : $this->input->get($key);
+        };
+        $exist = $this->db->where('uniquid', $request_value('uniquid'))
             ->get('checkin')->result();
         if (count($exist) == 0) {
-            $guest_unique_id = $this->input->get('guest_unique_id');
-            $guest_type = $this->input->get('guest_type');
+            $guest_unique_id = $request_value('guest_unique_id');
+            $guest_type = $request_value('guest_type');
             if ($guest_type == 'new') {
                 $data = array(
                     'guest_unique_id' => $guest_unique_id,
@@ -1146,85 +1172,85 @@ class CheckinController extends CI_Controller
 
 
             $data = array(
-                'guest_name' => $this->input->get('guest_name'),
-                'day_or_month' => $this->input->get('day_or_month'),
-                'uniquid' => $this->input->get('uniquid'),
+                'guest_name' => $request_value('guest_name'),
+                'day_or_month' => $request_value('day_or_month'),
+                'uniquid' => $request_value('uniquid'),
 
-                'guest_unique_id' => $this->input->get('guest_unique_id'),
-                'country_id' => $this->input->get('country_id'),
-                'place' => $this->input->get('place'),
-                'date_of_birth' => date('Y-m-d', strtotime($this->input->get('date_of_birth'))),
-                'mobile' => $this->input->get('mobile'),
-                'entry_time' => $this->input->get('entry_time'),
-                'entry_date' => $this->input->get('entry_date'),
+                'guest_unique_id' => $request_value('guest_unique_id'),
+                'country_id' => $request_value('country_id'),
+                'place' => $request_value('place'),
+                'date_of_birth' => date('Y-m-d', strtotime($request_value('date_of_birth'))),
+                'mobile' => $request_value('mobile'),
+                'entry_time' => $request_value('entry_time'),
+                'entry_date' => $request_value('entry_date'),
                 'data_insert_time' => date('Y-m-d H:i:s'),
-                'profession_id' => $this->input->get('profession_id'),
-                'grandRent' => $this->input->get('grandRent'),
+                'profession_id' => $request_value('profession_id'),
+                'grandRent' => $request_value('grandRent'),
                 'user_id' => $this->session->userdata('user_id'),
                 'hotel_id' => $this->session->userdata('hotel_id'),
 
             );
-            $day_or_month_or_year = $this->input->get('day_or_month_or_year');
-            $room_id = $this->input->get('room_id');
-            $dateOfEntry = $this->input->get('dateOfEntry');
-            $dateOfExit = $this->input->get('dateOfExit');
-            $rent = $this->input->get('rent');
-            $insurance = $this->input->get('insurance');
-            $cash_or_credit = $this->input->get('cash_or_credit');
-            $account_number = $this->input->get('account_number');
+            $day_or_month_or_year = $request_value('day_or_month_or_year');
+            $room_id = $request_value('room_id');
+            $dateOfEntry = $request_value('dateOfEntry');
+            $dateOfExit = $request_value('dateOfExit');
+            $rent = $request_value('rent');
+            $insurance = $request_value('insurance');
+            $cash_or_credit = $request_value('cash_or_credit');
+            $account_number = $request_value('account_number');
             $insert_result = $this->db->insert('checkin', $data);
-            $due = $this->input->get('due');
+            $due = $request_value('due');
             $insert_id = $this->db->insert_id();
 
             // Update guest information in all checkin records with the same guest_unique_id
             $guest_update_data = array(
-                'guest_name' => $this->input->get('guest_name'),
-                'mobile' => $this->input->get('mobile'),
-                'profession_id' => $this->input->get('profession_id'),
-                'place' => $this->input->get('place'),
+                'guest_name' => $request_value('guest_name'),
+                'mobile' => $request_value('mobile'),
+                'profession_id' => $request_value('profession_id'),
+                'place' => $request_value('place'),
             );
-            $this->db->where('guest_unique_id', $this->input->get('guest_unique_id'))
+            $this->db->where('guest_unique_id', $request_value('guest_unique_id'))
                      ->update('checkin', $guest_update_data);
 
             $image_1 = '';
-            if ($this->input->get('image_1_name') != '') {
-                $image_1 = $this->input->get('image_1_name');
+            if ($request_value('image_1_name') != '') {
+                $image_1 = $request_value('image_1_name');
             }
             $image_2 = '';
-            if ($this->input->get('image_2_name') != '') {
-                $image_2 = $this->input->get('image_2_name');
+            if ($request_value('image_2_name') != '') {
+                $image_2 = $request_value('image_2_name');
             }
             $image_3 = '';
-            if ($this->input->get('image_3_name') != '') {
-                $image_3 = $this->input->get('image_3_name');
+            if ($request_value('image_3_name') != '') {
+                $image_3 = $request_value('image_3_name');
             }
             $image_4 = '';
-            if ($this->input->get('image_4_name') != '') {
-                $image_4 = $this->input->get('image_4_name');
+            if ($request_value('image_4_name') != '') {
+                $image_4 = $request_value('image_4_name');
             }
             $image_5 = '';
-            if ($this->input->get('image_5_name') != '') {
-                $image_5 = $this->input->get('image_5_name');
+            if ($request_value('image_5_name') != '') {
+                $image_5 = $request_value('image_5_name');
             }
             $image_6 = '';
-            if ($this->input->get('image_6_name') != '') {
-                $image_6 = $this->input->get('image_6_name');
+            if ($request_value('image_6_name') != '') {
+                $image_6 = $request_value('image_6_name');
             }
             $image_7 = '';
-            if ($this->input->get('image_7_name') != '') {
-                $image_7 = $this->input->get('image_7_name');
+            if ($request_value('image_7_name') != '') {
+                $image_7 = $request_value('image_7_name');
             }
             $image_8 = '';
-            if ($this->input->get('image_8_name') != '') {
-                $image_8 = $this->input->get('image_8_name');
+            if ($request_value('image_8_name') != '') {
+                $image_8 = $request_value('image_8_name');
             }
             $image_9 = '';
-            if ($this->input->get('image_9_name') != '') {
-                $image_9 = $this->input->get('image_9_name');
+            if ($request_value('image_9_name') != '') {
+                $image_9 = $request_value('image_9_name');
             }
             $image_10 = '';
-            if ($this->input->get('image_10_name') != '') {
-                $image_10 = $this->input->get('image_10_name');
+            if ($request_value('image_10_name') != '') {
+                $image_10 = $request_value('image_10_name');
             }
 
 
@@ -1280,10 +1306,27 @@ class CheckinController extends CI_Controller
                 'success' => 'Data has been saved successfully'
             );
             $this->session->set_userdata($sdata);
+
+            if ($is_ajax) {
+                echo json_encode(array(
+                    'status' => 'success',
+                    'message' => 'Data has been saved successfully',
+                    'redirect_url' => base_url('print-check-in-month/' . $insert_id),
+                ));
+                return;
+            }
+
             $data['checkin_id'] = $insert_id;
             $data['output_content'] = $this->load->view('checkin/print_checkin_month', $data, true);
             $this->load->view('admin_content', $data);
         } else {
+            if ($is_ajax) {
+                echo json_encode(array(
+                    'status' => 'duplicate',
+                    'message' => 'This data has already been saved.',
+                ));
+                return;
+            }
             $data['output_content'] = $this->load->view('checkin/print_checkin_month', $data, true);
             $this->load->view('admin_content', $data);
         }

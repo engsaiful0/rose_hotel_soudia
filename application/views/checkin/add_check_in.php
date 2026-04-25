@@ -83,7 +83,7 @@
         //var_dump($hotel_id);
         ?>
 
-        <form method="get" enctype="multipart/form-data" action="<?php echo base_url() ?>add-check-in-save">
+        <form id="checkinForm" method="post" enctype="multipart/form-data" action="<?php echo base_url() ?>add-check-in-save">
             <?php
             $uniquid = $this->db->select('*')->get('checkin');
             $uniquid = time() . 'day' . $hotel_id . str_pad($uniquid->num_rows() + 1, 5, '0', STR_PAD_LEFT);
@@ -589,7 +589,9 @@
                                 <div class="form-row">
                                     <div class="form-group col-md-12">
                                         <label for="inputEmail4">&nbsp;</label>
-                                        <button id="submit_button" type="submit" class="btn btn-primary"><?php
+                                        <button id="submit_button" type="submit" class="btn btn-primary">
+                                            <span id="submit_button_spinner" class="spinner-border spinner-border-sm mr-1" style="display:none;" role="status" aria-hidden="true"></span>
+                                            <span id="submit_button_text"><?php
                                                                                                             $placeholder = '';
                                                                                                             if ($language == 'english') {
                                                                                                                 echo 'Save';
@@ -598,7 +600,8 @@
                                                                                                                 echo 'يحفظ';
                                                                                                                 $placeholder = 'يحفظ';
                                                                                                             }
-                                                                                                            ?></button>
+                                                                                                            ?></span>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -619,4 +622,67 @@
         var due = Number(rent) - Number(paid);
         document.getElementById('due_' + id[1]).value = due;
     }
+</script>
+<script>
+    (function() {
+        var isSubmitting = false;
+        var $form = $('#checkinForm');
+        var $submitButton = $('#submit_button');
+        var $spinner = $('#submit_button_spinner');
+        var $globalLoader = $('#img');
+        var submitTextDefault = $('#submit_button_text').text();
+
+        function setSubmittingState(submitting) {
+            isSubmitting = submitting;
+            $submitButton.prop('disabled', submitting);
+            if (submitting) {
+                $spinner.show();
+                $submitButton.addClass('disabled');
+                $('#submit_button_text').text('Saving...');
+                $globalLoader.show();
+            } else {
+                $spinner.hide();
+                $submitButton.removeClass('disabled');
+                $('#submit_button_text').text(submitTextDefault);
+                $globalLoader.hide();
+            }
+        }
+
+        $form.on('submit', function(e) {
+            e.preventDefault();
+
+            if (isSubmitting) {
+                return false;
+            }
+
+            if (this.checkValidity && !this.checkValidity()) {
+                this.reportValidity();
+                return false;
+            }
+
+            setSubmittingState(true);
+
+            $.ajax({
+                url: $form.attr('action'),
+                type: ($form.attr('method') || 'GET').toUpperCase(),
+                data: $form.serialize(),
+                dataType: 'json',
+                cache: false,
+                success: function(response) {
+                    if (response && response.status === 'success' && response.redirect_url) {
+                        window.location.href = response.redirect_url;
+                        return;
+                    }
+                    setSubmittingState(false);
+                    alert((response && response.message) ? response.message : 'Save completed.');
+                },
+                error: function() {
+                    setSubmittingState(false);
+                    alert('Unable to save right now. Please try again.');
+                }
+            });
+
+            return false;
+        });
+    })();
 </script>
