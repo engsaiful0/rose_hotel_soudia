@@ -589,18 +589,13 @@
                                 <div class="form-row">
                                     <div class="form-group col-md-12">
                                         <label for="inputEmail4">&nbsp;</label>
-                                        <button id="submit_button" type="submit" class="btn btn-primary">
-                                            <span id="submit_button_spinner" class="spinner-border spinner-border-sm mr-1" style="display:none;" role="status" aria-hidden="true"></span>
-                                            <span id="submit_button_text"><?php
-                                                                                                            $placeholder = '';
-                                                                                                            if ($language == 'english') {
-                                                                                                                echo 'Save';
-                                                                                                                $placeholder = 'Save';
-                                                                                                            } else {
-                                                                                                                echo 'يحفظ';
-                                                                                                                $placeholder = 'يحفظ';
-                                                                                                            }
-                                                                                                            ?></span>
+                                        <?php
+                                        $save_btn_label = ($language == 'english') ? 'Save' : 'يحفظ';
+                                        $save_btn_saving = ($language == 'english') ? 'Saving...' : 'جارٍ الحفظ...';
+                                        ?>
+                                        <button id="submit_button" type="submit" class="btn btn-primary d-inline-flex align-items-center" data-saving-text="<?php echo htmlspecialchars($save_btn_saving, ENT_QUOTES, 'UTF-8'); ?>" aria-live="polite">
+                                            <span id="submit_button_spinner" class="spinner-border spinner-border-sm align-middle d-none mr-1" role="status" style="min-width:1em;min-height:1em" aria-hidden="true"></span>
+                                            <span id="submit_button_text"><?php echo $save_btn_label; ?></span>
                                         </button>
                                     </div>
                                 </div>
@@ -624,64 +619,73 @@
     }
 </script>
 <script>
+    /* Ajax save runs without jQuery: output_content is rendered *before* jQuery in admin layout. */
     (function() {
+        var form = document.getElementById('checkinForm');
+        if (!form) { return; }
+        var submitBtn = document.getElementById('submit_button');
+        var spinner = document.getElementById('submit_button_spinner');
+        var textEl = document.getElementById('submit_button_text');
         var isSubmitting = false;
-        var $form = $('#checkinForm');
-        var $submitButton = $('#submit_button');
-        var $spinner = $('#submit_button_spinner');
-        var $globalLoader = $('#img');
-        var submitTextDefault = $('#submit_button_text').text();
+        var submitTextDefault = textEl ? textEl.textContent.replace(/^\s+|\s+$/g, '') : 'Save';
+        var savingText = (submitBtn && submitBtn.getAttribute('data-saving-text')) ? submitBtn.getAttribute('data-saving-text') : 'Saving...';
 
         function setSubmittingState(submitting) {
-            isSubmitting = submitting;
-            $submitButton.prop('disabled', submitting);
-            if (submitting) {
-                $spinner.show();
-                $submitButton.addClass('disabled');
-                $('#submit_button_text').text('Saving...');
-                $globalLoader.show();
-            } else {
-                $spinner.hide();
-                $submitButton.removeClass('disabled');
-                $('#submit_button_text').text(submitTextDefault);
-                $globalLoader.hide();
+            isSubmitting = !!submitting;
+            if (submitBtn) {
+                submitBtn.disabled = isSubmitting;
+                submitBtn.setAttribute('aria-busy', isSubmitting ? 'true' : 'false');
             }
+            if (spinner) {
+                if (isSubmitting) { spinner.classList.remove('d-none'); } else { spinner.classList.add('d-none'); }
+                spinner.setAttribute('aria-hidden', isSubmitting ? 'false' : 'true');
+            }
+            if (textEl) { textEl.textContent = isSubmitting ? savingText : submitTextDefault; }
         }
 
-        $form.on('submit', function(e) {
+        form.addEventListener('submit', function(e) {
             e.preventDefault();
-
-            if (isSubmitting) {
+            if (isSubmitting) { return false; }
+            if (form.checkValidity && !form.checkValidity()) {
+                form.reportValidity();
                 return false;
             }
-
-            if (this.checkValidity && !this.checkValidity()) {
-                this.reportValidity();
-                return false;
-            }
-
             setSubmittingState(true);
 
-            $.ajax({
-                url: $form.attr('action'),
-                type: ($form.attr('method') || 'GET').toUpperCase(),
-                data: $form.serialize(),
-                dataType: 'json',
-                cache: false,
-                success: function(response) {
-                    if (response && response.status === 'success' && response.redirect_url) {
-                        window.location.href = response.redirect_url;
-                        return;
-                    }
-                    setSubmittingState(false);
-                    alert((response && response.message) ? response.message : 'Save completed.');
-                },
-                error: function() {
+            var action = form.getAttribute('action');
+            if (!action) { setSubmittingState(false); return false; }
+
+            var fd = new FormData(form);
+            fetch(action, {
+                method: (form.getAttribute('method') || 'POST').toUpperCase(),
+                body: fd,
+                credentials: 'same-origin',
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+            })
+            .then(function(res) { return res.text().then(function(t) { return { ok: res.ok, text: t }; }); })
+            .then(function(r) {
+                if (!r.ok) {
                     setSubmittingState(false);
                     alert('Unable to save right now. Please try again.');
+                    return;
                 }
+                var data;
+                try { data = JSON.parse(r.text); } catch (err) {
+                    setSubmittingState(false);
+                    alert('Save response was not valid. Please try again or reload the page.');
+                    return;
+                }
+                if (data && data.status === 'success' && data.redirect_url) {
+                    window.location.href = data.redirect_url;
+                    return;
+                }
+                setSubmittingState(false);
+                alert((data && data.message) ? data.message : 'Save completed.');
+            })
+            .catch(function() {
+                setSubmittingState(false);
+                alert('Unable to save right now. Please try again.');
             });
-
             return false;
         });
     })();

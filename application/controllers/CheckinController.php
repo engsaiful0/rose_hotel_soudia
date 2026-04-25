@@ -1128,7 +1128,7 @@ class CheckinController extends CI_Controller
                 echo json_encode(array(
                     'status' => 'success',
                     'message' => 'Data has been saved successfully',
-                    'redirect_url' => base_url('print-check-in/' . $insert_id),
+                    'redirect_url' => base_url('checkin-print/' . $insert_id),
                 ));
                 return;
             }
@@ -1311,7 +1311,7 @@ class CheckinController extends CI_Controller
                 echo json_encode(array(
                     'status' => 'success',
                     'message' => 'Data has been saved successfully',
-                    'redirect_url' => base_url('print-check-in-month/' . $insert_id),
+                    'redirect_url' => base_url('checkin-print-month/' . $insert_id),
                 ));
                 return;
             }
