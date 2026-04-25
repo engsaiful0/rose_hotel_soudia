@@ -44,7 +44,7 @@
                                 if ($language == 'english') {
                                     echo 'Due: ';
                                 } else {
-                                    echo 'حق:';
+                                    echo 'بسبب:';
                                 }
                                 echo $language == 'english' ? $renew_due : Convertnumber2arabic((string) $renew_due);
                                 ?></p>

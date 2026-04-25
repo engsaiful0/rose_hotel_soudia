@@ -48,7 +48,7 @@
                                   if ($language == 'english') {
                                     echo 'Due: ';
                                 } else {
-                                    echo 'حق:';
+                                    echo 'بسبب:';
                                 }
                                 echo $language == 'english' ? $room_due : Convertnumber2arabic((string) $room_due);
                                 ?></p>
