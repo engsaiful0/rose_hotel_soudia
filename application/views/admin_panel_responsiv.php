@@ -41,13 +41,8 @@ include 'header.php';
         // KSA business day: 05:00 today → 05:00 next day (Asia/Riyadh, set in <head>).
         // Before 05:00 we still attribute totals to the calendar day that started at yesterday 05:00.
         $today_5am = strtotime(date('Y-m-d') . ' 05:00:00');
-        $business_date = (time() < $today_5am)
-            ? date('Y-m-d', strtotime('-1 day', $today_5am))
-            : date('Y-m-d');
-        // Total Income (Cash/Credit) for "today": sum rent by dateOfEntry = business_date (entry/stay day), not data_insert_time
-//        $time = date('i');
-//        print_r($time);
-        //die;
+        $business_date = date('Y-m-d');
+
         include 'functions.php';
         $language = $this->session->userdata('language');
         $user_type = $this->session->userdata('type');
