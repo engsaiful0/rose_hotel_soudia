@@ -1395,6 +1395,8 @@ class CheckinController extends CI_Controller
         $hotel_id = '';
         $hotel_id = $_SESSION['hotel_id'] != '' ? $_SESSION['hotel_id'] : $this->input->post('hotel_id');
         $room_id = $this->input->post('room_id');
+        $from_date = '';
+        $to_date = '';
         if ($this->input->post('from_date') != '') {
             $from_date = date('Y-m-d', strtotime($this->input->post('from_date')));
         }
@@ -1448,6 +1450,11 @@ class CheckinController extends CI_Controller
             $this->db->where('checkin_details.dateOfEntry<=', $to_date);
             $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
             // print_r('1');
+        } else if ($room_id == '' && $hotel_id != '' && $from_date != '' && $to_date != '') {
+            $this->db->where('checkin_details.hotel_id', $hotel_id);
+            $this->db->where('checkin_details.dateOfEntry >=', $from_date);
+            $this->db->where('checkin_details.dateOfEntry <=', $to_date);
+            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
         } else if ($room_id != '' && $hotel_id != '' && $from_date != '' && $to_date == '') {
             $this->db->where('checkin_details.room_id', $room_id);
             $this->db->where('checkin_details.hotel_id', $hotel_id);
@@ -1495,7 +1502,6 @@ class CheckinController extends CI_Controller
             $this->db->where('checkin_details.dateOfEntry>=', $to_date);
             $this->db->where('checkin_details.dateOfEntry<=', $to_date);
             $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
-            print_r('6');
         } else if ($room_id != '' && $hotel_id != '' && $from_date == '' && $to_date == '') {
             $this->db->where('checkin_details.room_id', $room_id);
             $this->db->where('checkin_details.hotel_id', $hotel_id);
@@ -1576,124 +1582,41 @@ class CheckinController extends CI_Controller
             $this->session->set_userdata($sdata);
         }
 
-        $hotel_id = $_SESSION['hotel_id'] != '' ? $_SESSION['hotel_id'] : $this->input->post('hotel_id');
-        $room_id = $this->input->post('room_id');
-        if ($this->input->post('from_date') != '') {
-            $from_date = date('Y-m-d', strtotime($this->input->post('from_date')));
-        }
-        if ($this->input->post('to_date') != '') {
-            $to_date = date('Y-m-d', strtotime($this->input->post('to_date')));
-        }
         $guest_unique_id = $this->input->post('guest_unique_id');
-        if (isset($_POST['room_id'])) {
-            $room_id = $this->input->post('room_id');
-        }
+        if (strtolower((string) $this->input->server('REQUEST_METHOD')) === 'post') {
+            $from_date = $this->parse_checkin_list_date($this->input->post('from_date'));
+            $to_date = $this->parse_checkin_list_date($this->input->post('to_date'));
+            $room_id = (string) ($this->input->post('room_id') ?? '');
 
-
-        if($hotel_id!='')
-        {
-            $sdata = array(
+            if (isset($_SESSION['hotel_id']) && $_SESSION['hotel_id'] !== '' && $_SESSION['hotel_id'] !== null) {
+                $hotel_id = (string) $_SESSION['hotel_id'];
+            } else {
+                $hp = $this->input->post('hotel_id');
+                $hotel_id = ($hp !== null && (string) $hp !== '') ? (string) $hp : '';
+            }
+            $this->session->set_userdata(array(
                 'search_hotel_id' => $hotel_id,
-            );
-            $this->session->set_userdata($sdata);
-        }
-        if($room_id!='')
-        {
-            $sdata = array(
                 'search_room_id' => $room_id,
-            );
-            $this->session->set_userdata($sdata);
-        }
-        if($from_date!='')
-        {
-            $sdata = array(
                 'search_from_date' => $from_date,
-            );
-            $this->session->set_userdata($sdata);
-        }
-        if($to_date!='')
-        {
-            $sdata = array(
                 'search_to_date' => $to_date,
-            );
-            $this->session->set_userdata($sdata);
+            ));
         }
 
-        $hotel_id = $this->session->userdata('search_hotel_id');
-        $room_id = $this->session->userdata('search_room_id');
-        $from_date = $this->session->userdata('search_from_date');
-        $to_date = $this->session->userdata('search_to_date');
+        $hotel_id = (string) ($this->session->userdata('search_hotel_id') ?? '');
+        $room_id = (string) ($this->session->userdata('search_room_id') ?? '');
+        $from_date = (string) ($this->session->userdata('search_from_date') ?? '');
+        $to_date = (string) ($this->session->userdata('search_to_date') ?? '');
 
-
-        $this->db->where('checkin_details.is_deleted', '0');
-        $this->db->where('checkin_details.day_or_month', 'day');
-        if ($room_id != '' && $hotel_id != '' && $from_date != '' && $to_date != '') {
-            $this->db->where('checkin_details.room_id', $room_id);
-            $this->db->where('checkin_details.hotel_id', $hotel_id);
-            $this->db->where('checkin_details.dateOfEntry>=', $from_date);
-            $this->db->where('checkin_details.dateOfEntry<=', $to_date);
-            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
-            // print_r('1');
-        } else if ($room_id != '' && $hotel_id != '' && $from_date != '' && $to_date == '') {
-            $this->db->where('checkin_details.room_id', $room_id);
-            $this->db->where('checkin_details.hotel_id', $hotel_id);
-            $this->db->where('checkin_details.dateOfEntry>=', $from_date);
-            $this->db->where('checkin_details.dateOfEntry<=', $from_date);
-            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
-            //  print_r('2');
-        } else if ($room_id != '' && $hotel_id != '' && $from_date == '' && $to_date != '') {
-            $this->db->where('checkin_details.room_id', $room_id);
-            $this->db->where('checkin_details.hotel_id', $hotel_id);
-            $this->db->where('checkin_details.dateOfEntry>=', $to_date);
-            $this->db->where('checkin_details.dateOfEntry<=', $to_date);
-            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
-            //  print_r('2');
-        }
-        else if ($room_id == '' && $hotel_id != '' && $from_date == '' && $to_date == '') {
-            $this->db->where('checkin_details.hotel_id', $hotel_id);
-            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
-            // print_r('3');
-            //  print_r('<br>'.$config['total_rows']);
-        } else if ($room_id == '' && $hotel_id == '' && $from_date != '' && $to_date != '') {
-            $this->db->where('checkin_details.dateOfEntry>=', $from_date);
-            $this->db->where('checkin_details.dateOfEntry<=', $to_date);
-            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
-            //print_r('4');
-        } else if ($room_id == '' && $hotel_id == '' && $from_date != '' && $to_date == '') {
-            $this->db->where('checkin_details.dateOfEntry>=', $from_date);
-            $this->db->where('checkin_details.dateOfEntry<=', $from_date);
-            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
-            // print_r('5');
-        } else if ($room_id == '' && $hotel_id != '' && $from_date != '' && $to_date == '') {
-            $this->db->where('checkin_details.dateOfEntry>=', $from_date);
-            $this->db->where('checkin_details.dateOfEntry<=', $from_date);
-            $this->db->where('checkin_details.hotel_id', $hotel_id);
-            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
-            // print_r('5');
-        }else if ($room_id == '' && $hotel_id != '' && $from_date == '' && $to_date != '') {
-            $this->db->where('checkin_details.dateOfEntry>=', $to_date);
-            $this->db->where('checkin_details.dateOfEntry<=', $to_date);
-            $this->db->where('checkin_details.hotel_id', $hotel_id);
-            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
-            //print_r('6');
-        }
-        else if ($room_id == '' && $hotel_id == '' && $from_date == '' && $to_date != '') {
-            $this->db->where('checkin_details.dateOfEntry>=', $to_date);
-            $this->db->where('checkin_details.dateOfEntry<=', $to_date);
-            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
-            print_r('6');
-        } else if ($room_id != '' && $hotel_id != '' && $from_date == '' && $to_date == '') {
-            $this->db->where('checkin_details.room_id', $room_id);
-            $this->db->where('checkin_details.hotel_id', $hotel_id);
-            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
-            // print_r('7');
-        } else if ($room_id == '' && $hotel_id == '' && $from_date == '' && $to_date == '') {
-            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
-            // print_r('8');
+        if (isset($_SESSION['hotel_id']) && $_SESSION['hotel_id'] !== '' && $_SESSION['hotel_id'] !== null) {
+            $hotel_id = (string) $_SESSION['hotel_id'];
         }
 
-//print_r('<br>'.$config['total_rows']);
-
+        $config['total_rows'] = $this->CheckInModel->count_checkin_details_day(
+            $hotel_id,
+            $room_id,
+            $from_date,
+            $to_date
+        );
 
         $config['base_url'] = site_url('CheckinController/view_check_in_day');
 
@@ -1886,6 +1809,33 @@ class CheckinController extends CI_Controller
         $data['output_content'] = $this->load->view('checkin/checkin_edit_month', $data, true);
         $data['flag'] = '';
         $this->load->view('admin_content', $data);
+    }
+
+    /**
+     * Parse date from view-check-in datepicker (jQuery: dd-mm-yy) to Y-m-d.
+     */
+    protected function parse_checkin_list_date($value)
+    {
+        if ($value === null) {
+            return '';
+        }
+        $v = trim((string) $value);
+        if ($v === '') {
+            return '';
+        }
+        $d = \DateTime::createFromFormat('!d-m-Y', $v);
+        if ($d instanceof \DateTime) {
+            return $d->format('Y-m-d');
+        }
+        $d2 = \DateTime::createFromFormat('!d-m-y', $v);
+        if ($d2 instanceof \DateTime) {
+            return $d2->format('Y-m-d');
+        }
+        $ts = strtotime($v);
+        if ($ts !== false) {
+            return date('Y-m-d', $ts);
+        }
+        return '';
     }
 
 }
