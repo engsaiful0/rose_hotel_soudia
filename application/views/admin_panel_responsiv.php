@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <?php
     date_default_timezone_set('Asia/Riyadh');
+    include __DIR__ . '/functions.php';
     $banner = $this->db->where('banner_id', '1')->get('company')->row();
     $title = $this->db->where('banner_id', '1')->get('company')->row();
     $hotel_id = $this->session->userdata('hotel_id');
@@ -38,19 +39,14 @@ include 'header.php';
     <div class="container-fluid site-width">
         <?php
         $data = date('Y-m-d');
-        // KSA business day: 05:00 today → 05:00 next day (Asia/Riyadh, set in <head>).
-        // Before 05:00 we still attribute totals to the calendar day that started at yesterday 05:00.
-        $today_5am = strtotime(date('Y-m-d') . ' 05:00:00');
-        $business_date = (time() < $today_5am)
-            ? date('Y-m-d', strtotime('-1 day', $today_5am))
-            : date('Y-m-d');
-        // Total Income (Cash/Credit): checkin rows by data_insert_time in [business_date 05:00, next day 05:00)
-        $cash_window_start = $business_date . ' 05:00:00';
-        $cash_window_end = date('Y-m-d 05:00:00', strtotime($business_date . ' +1 day'));
+        // Cash/credit from checkin_details: data_insert_time in [today 05:00, tomorrow 05:00) for current business day.
+        $business_date = hotel_business_date_now();
+        $cash_window = hotel_checkin_cash_window_for_business_date($business_date);
+        $cash_window_start = $cash_window['start'];
+        $cash_window_end = $cash_window['end'];
 //        $time = date('i');
 //        print_r($time);
         //die;
-        include 'functions.php';
         $language = $this->session->userdata('language');
         $user_type = $this->session->userdata('type');
         $hotels = '';

@@ -55,6 +55,7 @@
 </style>
 <?php
 date_default_timezone_set('Asia/Riyadh');
+include __DIR__ . '/../functions.php';
 $language = $this->session->userdata('language');
 
 if ($hotel_id === '' || $hotel_id === null) {
@@ -110,8 +111,9 @@ $date_range_label = $language == 'english'
 
         for ($t = strtotime($from_date); $t <= strtotime($to_date); $t = strtotime('+1 day', $t)) {
             $business_date = date('Y-m-d', $t);
-            $cash_window_start = $business_date . ' 05:00:00';
-            $cash_window_end = date('Y-m-d 05:00:00', strtotime($business_date . ' +1 day'));
+            $cash_window = hotel_checkin_cash_window_for_business_date($business_date);
+            $cash_window_start = $cash_window['start'];
+            $cash_window_end = $cash_window['end'];
 
             $income_cash_row = $this->db->select_sum('rent', 'amount')
                 ->where('cash_or_credit', 'cash')
