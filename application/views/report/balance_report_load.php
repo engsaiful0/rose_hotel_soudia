@@ -111,9 +111,9 @@ $date_range_label = $language == 'english'
 
         for ($t = strtotime($from_date); $t <= strtotime($to_date); $t = strtotime('+1 day', $t)) {
             $business_date = date('Y-m-d', $t);
-            $cash_window = hotel_checkin_cash_window_for_business_date($business_date);
-            $cash_window_start = $cash_window['start'];
-            $cash_window_end = $cash_window['end'];
+            // data_insert_time (TIMESTAMP): match calendar day, same as admin panel
+            $cash_window_start = $business_date . ' 00:00:00';
+            $cash_window_end = date('Y-m-d H:i:s', strtotime($business_date . ' +1 day'));
 
             $income_cash_row = $this->db->select_sum('rent', 'amount')
                 ->where('cash_or_credit', 'cash')
