@@ -161,7 +161,9 @@ include 'header.php';
                                     $income_cash = $this->db->select_sum('rent', 'amount')
                                         ->where('cash_or_credit', 'cash')
                                         ->where('hotel_id', $hotel->hotel_id)
-                                        ->where('dateOfEntry', $business_date)
+                                        ->where('is_deleted', 0)
+                                        ->where('data_insert_time >=', $cash_window_start)
+                                        ->where('data_insert_time <', $cash_window_end)
                                         ->get('checkin_details')->result();
 
                                     $late = $this->db->select_sum('amount', 'amount')
@@ -214,7 +216,8 @@ include 'header.php';
                                         ->where('cash_or_credit', 'credit')
                                         ->where('hotel_id', $hotel->hotel_id)
                                         ->where('is_deleted', 0)
-                                        ->where('dateOfEntry', $business_date)
+                                        ->where('data_insert_time >=', $cash_window_start)
+                                        ->where('data_insert_time <', $cash_window_end)
                                         ->get('checkin_details')->result();
                                     ?>
                                     <p style="text-align: center;color: white"><?php echo $income_credit[0]->amount; ?></p>
