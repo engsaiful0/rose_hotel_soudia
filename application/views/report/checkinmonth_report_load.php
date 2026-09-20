@@ -72,6 +72,7 @@
                             $this->db
                                 ->where('checkin_details.hotel_id', $hotel_id)
                                 ->where('checkin_details.is_deleted', '0')
+                                ->where('checkin_details.day_or_month', 'month')
                                 ->where('checkin_details.dateOfEntry>=', date('Y-m-d', strtotime($from_date)))
                                 ->where('checkin_details.dateOfEntry<=', date('Y-m-d', strtotime($to_date)));
                             $this->db->from('checkin_details');
@@ -85,6 +86,7 @@
                             $this->db->select('*');
                             $this->db
                                 ->where('checkin_details.is_deleted', '0')
+                                ->where('checkin_details.day_or_month', 'month')
                                 ->where('checkin_details.dateOfEntry>=', date('Y-m-d', strtotime($from_date)))
                                 ->where('checkin_details.dateOfEntry<=', date('Y-m-d', strtotime($to_date)));
                             $this->db->from('checkin_details');
@@ -110,16 +112,16 @@
                                     echo $query_value->room_no_in_english;
                                     ?>
                                 </td>
-                                <td>
-                                    <?php echo date('d-m-Y',strtotime($query_value->dateOfEntry)) ?>
-                                </td>
+                              
 
                                 <td>
                                     <?php echo $query_value->rent;
                                     $all_grand_net_total+=$query_value->rent;
                                     ?>
                                 </td>
-
+  <td>
+                                    <?php echo date('d-m-Y',strtotime($query_value->dateOfEntry)) ?>
+                                </td>
 
                             </tr>
                             <?php
