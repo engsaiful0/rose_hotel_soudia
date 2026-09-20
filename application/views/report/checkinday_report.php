@@ -84,7 +84,7 @@
         var from_date = $('#from_date').val();
         var to_date = $('#to_date').val();
         var hotel_id = $('#hotel_id').val();
-        var day_or_month_or_year = $('#day_or_month_or_year').val();
+        var day_or_month_or_year = $('#day_or_month_or_year_5').val();
         var xhttp = new XMLHttpRequest();
         xhttp.onreadystatechange = function () {
             if (xhttp.readyState == 4 && xhttp.status == 200) {
