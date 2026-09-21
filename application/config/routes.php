@@ -135,6 +135,8 @@ $route['start-renew-day/(:any)'] = 'CheckinController/start_renew_day/$1';
 $route['start-renew-month/(:any)'] = 'CheckinController/start_renew_month/$1';
 
 $route['renew/(:any)'] = 'CheckinController/renew/$1';
+$route['due-payment/(:any)'] = 'CheckinController/due_payment/$1';
+$route['due-payment-save'] = 'CheckinController/due_payment_save';
 $route['checkin-print/(:any)'] = 'CheckinController/checkin_print_day/$1';
 $route['add-check-in'] = 'CheckinController/add_check_in';
 $route['add-check-in-save'] = 'CheckinController/add_check_in_save';

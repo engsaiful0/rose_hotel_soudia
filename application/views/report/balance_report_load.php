@@ -111,11 +111,11 @@ $date_range_label = $language == 'english'
 
         for ($t = strtotime($from_date); $t <= strtotime($to_date); $t = strtotime('+1 day', $t)) {
             $business_date = date('Y-m-d', $t);
-            // data_insert_time (TIMESTAMP): match calendar day, same as admin panel
-            $cash_window_start = $business_date . ' 00:00:00';
-            $cash_window_end = date('Y-m-d H:i:s', strtotime($business_date . ' +1 day'));
+            $cash_window = hotel_checkin_cash_window_for_business_date($business_date);
+            $cash_window_start = $cash_window['start'];
+            $cash_window_end = $cash_window['end'];
 
-            $income_cash_row = $this->db->select_sum('rent', 'amount')
+            $income_cash_row = $this->db->select('SUM(rent - COALESCE(due, 0)) AS amount', false)
                 ->where('cash_or_credit', 'cash')
                 ->where('hotel_id', $hotel_id)
                 ->where('is_deleted', 0)
@@ -123,13 +123,29 @@ $date_range_label = $language == 'english'
                 ->where('data_insert_time <', $cash_window_end)
                 ->get('checkin_details')->row();
 
-            $income_credit_row = $this->db->select_sum('rent', 'amount')
+            $income_credit_row = $this->db->select('SUM(rent - COALESCE(due, 0)) AS amount', false)
                 ->where('cash_or_credit', 'credit')
                 ->where('hotel_id', $hotel_id)
                 ->where('is_deleted', 0)
                 ->where('data_insert_time >=', $cash_window_start)
                 ->where('data_insert_time <', $cash_window_end)
                 ->get('checkin_details')->row();
+
+            $due_cash_row = $this->db->select_sum('rent', 'amount')
+                ->where('renew_comment', 'due_payment')
+                ->where('cash_or_credit', 'cash')
+                ->where('hotel_id', $hotel_id)
+                ->where('data_insert_time >=', $cash_window_start)
+                ->where('data_insert_time <', $cash_window_end)
+                ->get('renew')->row();
+
+            $due_credit_row = $this->db->select_sum('rent', 'amount')
+                ->where('renew_comment', 'due_payment')
+                ->where('cash_or_credit', 'credit')
+                ->where('hotel_id', $hotel_id)
+                ->where('data_insert_time >=', $cash_window_start)
+                ->where('data_insert_time <', $cash_window_end)
+                ->get('renew')->row();
 
             $late_row = $this->db->select_sum('amount', 'amount')
                 ->where('hotel_id', $hotel_id)
@@ -148,8 +164,10 @@ $date_range_label = $language == 'english'
                 ->get('expense')->result();
 
             $cash = (float)($income_cash_row && $income_cash_row->amount !== null ? $income_cash_row->amount : 0);
+            $cash += (float)($due_cash_row && $due_cash_row->amount !== null ? $due_cash_row->amount : 0);
             $cash += (float)($late_row && $late_row->amount !== null ? $late_row->amount : 0);
             $credit = (float)($income_credit_row && $income_credit_row->amount !== null ? $income_credit_row->amount : 0);
+            $credit += (float)($due_credit_row && $due_credit_row->amount !== null ? $due_credit_row->amount : 0);
             $expense = (float)($expense_sum_row && $expense_sum_row->amount !== null ? $expense_sum_row->amount : 0);
 
             $desc_parts = array();

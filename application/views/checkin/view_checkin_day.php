@@ -577,6 +577,16 @@ $hotel_id = $this->session->userdata('hotel_id');
                                     <td>
                                         <a title="Print" class="btn btn-primary" href="<?php echo base_url() ?>checkin-print/<?php echo $checkin_id ?>"><i class="fa fa-print "></i></a>
                                     </td>
+                                    <?php
+                                    $due_paid = $this->db->select_sum('rent', 'amount')
+                                        ->where('checkin_details_id', $checkin_details_id)
+                                        ->where('renew_comment', 'due_payment')
+                                        ->get('renew')->row();
+                                    if ((float) $result[$i]->due - (float) ($due_paid->amount ?? 0) > 0) { ?>
+                                        <td>
+                                            <a title="Pay Due" class="btn btn-warning" href="<?php echo base_url() ?>due-payment/<?php echo $checkin_details_id ?>">Pay Due</a>
+                                        </td>
+                                    <?php } ?>
                                     <td>
                                         <a onclick="return confirm('Do you want to renew?')" title="Details" class="btn btn-primary" href="<?php echo base_url() ?>start-renew-day/<?php echo $checkin_details_id ?>"><?php
                                                                                                                                                                                                                         if ($language == 'english') {

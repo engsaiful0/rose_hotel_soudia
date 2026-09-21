@@ -18,13 +18,24 @@
             <div class="col-md-12">
                 <?php
                 $sl = 1;
-                $checkin_details_renews = $this->db->where('renew_status', 'renew_sarted')->where('hotel_id', $hotel->hotel_id)->get('checkin_details')->result();
+                $checkin_details_renews = $this->db
+                    ->where('hotel_id', $hotel->hotel_id)
+                    ->where('is_deleted', 0)
+                    ->group_start()
+                    ->where('renew_status', 'renew_sarted')
+                    ->or_where('due >', 0)
+                    ->group_end()
+                    ->get('checkin_details')->result();
                 //                                echo '<pre>';
                 //                                print_r($checkin_details_renews);
                 //                                die;
                 foreach ($checkin_details_renews as $checkin_details_renew) {
                     $room_renew = $this->db->where('room_id', $checkin_details_renew->room_id)->get('room')->row();
-                    $renew_due = isset($checkin_details_renew->due) ? (float) $checkin_details_renew->due : 0.0;
+                    $due_paid = $this->db->select_sum('rent', 'amount')
+                        ->where('checkin_details_id', $checkin_details_renew->checkin_details_id)
+                        ->where('renew_comment', 'due_payment')
+                        ->get('renew')->row();
+                    $renew_due = (float) ($checkin_details_renew->due ?? 0) - (float) ($due_paid->amount ?? 0);
                     ?>
                     <div class="container-room"
                          style="background-image: url('<?php base_url()?>assets/renew.jpg');background-repeat: no-repeat;float: left;width: 110px;height: 200px;  ">
@@ -52,7 +63,12 @@
                             }
                             ?>
                             <?php
-                            if ($checkin_details_renew->day_or_month == 'day') {
+                            if ($checkin_details_renew->due > 0) {
+                                ?>
+                                <a style="width: 100%;font-weight: bold;color: red;padding-left: 20px;font-size: 13px;" title="Pay Due"
+                                   href="<?php echo base_url() ?>due-payment/<?php echo $checkin_details_renew->checkin_details_id ?>">Pay Due</a>
+                                <?php
+                            } elseif ($checkin_details_renew->day_or_month == 'day') {
                                 ?>
                                 <a style="width: 100%;font-weight: bold;color: red;padding-left: 35px;font-size: 15px;" title="Details"
                                    href="<?php echo base_url() ?>renew/<?php echo $checkin_details_renew->checkin_details_id ?>"><?php

@@ -158,20 +158,27 @@ include 'header.php';
                                         }
                                         ?></p>
                                     <?php
-                                    $income_cash = $this->db->select_sum('rent', 'amount')
+                                    $income_cash = $this->db->select('SUM(rent - COALESCE(due, 0)) AS amount', false)
                                         ->where('cash_or_credit', 'cash')
                                         ->where('hotel_id', $hotel->hotel_id)
                                         ->where('is_deleted', 0)
                                         ->where('data_insert_time >=', $cash_window_start)
                                         ->where('data_insert_time <', $cash_window_end)
                                         ->get('checkin_details')->result();
+                                    $due_cash = $this->db->select_sum('rent', 'amount')
+                                        ->where('renew_comment', 'due_payment')
+                                        ->where('cash_or_credit', 'cash')
+                                        ->where('hotel_id', $hotel->hotel_id)
+                                        ->where('data_insert_time >=', $cash_window_start)
+                                        ->where('data_insert_time <', $cash_window_end)
+                                        ->get('renew')->result();
 
                                     $late = $this->db->select_sum('amount', 'amount')
                                         ->where('hotel_id', $hotel->hotel_id)
                                         ->where('date', $business_date)
                                        ->get('late')->result();
                                     ?>
-                                    <p style="text-align: center;color: white"><?php echo $income_cash[0]->amount+$late[0]->amount; ?></p>
+                                    <p style="text-align: center;color: white"><?php echo (float) $income_cash[0]->amount+(float) $due_cash[0]->amount+(float) $late[0]->amount; ?></p>
                                 </div>
 
                             </div>
@@ -212,15 +219,22 @@ include 'header.php';
                                         }
                                         ?></p>
                                     <?php
-                                    $income_credit = $this->db->select_sum('rent', 'amount')
+                                    $income_credit = $this->db->select('SUM(rent - COALESCE(due, 0)) AS amount', false)
                                         ->where('cash_or_credit', 'credit')
                                         ->where('hotel_id', $hotel->hotel_id)
                                         ->where('is_deleted', 0)
                                         ->where('data_insert_time >=', $cash_window_start)
                                         ->where('data_insert_time <', $cash_window_end)
                                         ->get('checkin_details')->result();
+                                    $due_credit = $this->db->select_sum('rent', 'amount')
+                                        ->where('renew_comment', 'due_payment')
+                                        ->where('cash_or_credit', 'credit')
+                                        ->where('hotel_id', $hotel->hotel_id)
+                                        ->where('data_insert_time >=', $cash_window_start)
+                                        ->where('data_insert_time <', $cash_window_end)
+                                        ->get('renew')->result();
                                     ?>
-                                    <p style="text-align: center;color: white"><?php echo $income_credit[0]->amount; ?></p>
+                                    <p style="text-align: center;color: white"><?php echo (float) $income_credit[0]->amount+(float) $due_credit[0]->amount; ?></p>
                                 </div>
 
                             </div>

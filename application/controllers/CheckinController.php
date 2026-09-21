@@ -674,6 +674,67 @@ class CheckinController extends CI_Controller
         $this->load->view('admin_content', $data);
     }
 
+    public function due_payment($checkin_details_id)
+    {
+        $checkin_details = $this->db->where('checkin_details_id', $checkin_details_id)
+            ->get('checkin_details')->row();
+        $due_paid = $checkin_details ? $this->db->select_sum('rent', 'amount')
+            ->where('checkin_details_id', $checkin_details_id)
+            ->where('renew_comment', 'due_payment')
+            ->get('renew')->row() : null;
+        $outstanding_due = (float) ($checkin_details->due ?? 0) - (float) ($due_paid->amount ?? 0);
+        $is_authorized_hotel = $checkin_details && ($this->session->userdata('type') == 'superadmin' || $checkin_details->hotel_id == $this->session->userdata('hotel_id'));
+        if (!$is_authorized_hotel || $outstanding_due <= 0) {
+            redirect($checkin_details && $checkin_details->day_or_month == 'month' ? 'view-check-in-month' : 'view-check-in');
+        }
+
+        $data['checkin_details'] = $checkin_details;
+        $data['outstanding_due'] = $outstanding_due;
+        $data['checkin'] = $this->db->where('checkin_id', $checkin_details->checkin_id)->get('checkin')->row();
+        $data['output_content'] = $this->load->view('checkin/due_payment', $data, true);
+        $data['flag'] = '';
+        $this->load->view('admin_content', $data);
+    }
+
+    public function due_payment_save()
+    {
+        $checkin_details_id = (int) $this->input->post('checkin_details_id');
+        $amount = (float) $this->input->post('amount');
+        $cash_or_credit = $this->input->post('cash_or_credit') == 'credit' ? 'credit' : 'cash';
+        $checkin_details = $this->db->where('checkin_details_id', $checkin_details_id)
+            ->get('checkin_details')->row();
+        $due_paid = $checkin_details ? $this->db->select_sum('rent', 'amount')
+            ->where('checkin_details_id', $checkin_details_id)
+            ->where('renew_comment', 'due_payment')
+            ->get('renew')->row() : null;
+        $outstanding_due = (float) ($checkin_details->due ?? 0) - (float) ($due_paid->amount ?? 0);
+
+        $is_authorized_hotel = $checkin_details && ($this->session->userdata('type') == 'superadmin' || $checkin_details->hotel_id == $this->session->userdata('hotel_id'));
+        if (!$is_authorized_hotel || $amount <= 0 || $amount > $outstanding_due) {
+            $this->session->set_flashdata('error', 'Payment must be greater than zero and no more than the outstanding due.');
+            redirect('due-payment/' . $checkin_details_id);
+        }
+
+        $remaining_due = $outstanding_due - $amount;
+        $this->db->trans_start();
+        $this->db->insert('renew', array(
+            'checkin_id' => $checkin_details->checkin_id,
+            'checkin_details_id' => $checkin_details_id,
+            'room_id' => $checkin_details->room_id,
+            'rent' => $amount,
+            'due' => $remaining_due,
+            'cash_or_credit' => $cash_or_credit,
+            'renew_comment' => 'due_payment',
+            'data_insert_time' => date('Y-m-d H:i:s'),
+            'user_id' => $this->session->userdata('user_id'),
+            'hotel_id' => $checkin_details->hotel_id,
+        ));
+        $this->db->trans_complete();
+
+        $this->session->set_flashdata('success', 'Due payment recorded successfully.');
+        redirect($checkin_details->day_or_month == 'month' ? 'checkin-print-month/' . $checkin_details->checkin_id : 'checkin-print/' . $checkin_details->checkin_id);
+    }
+
     public function start_renew_day($checkin_details_id)
     {
         $checkin_details = $this->db->where('checkin_details_id', $checkin_details_id)->get('checkin_details')->row();

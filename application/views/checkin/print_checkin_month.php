@@ -67,6 +67,10 @@
     $checkin_details = $this->db->select('*')
         ->where('checkin_id', $checkin_id)
         ->get('checkin_details')->result();
+    $due_payments = $this->db->where('checkin_id', $checkin_id)
+        ->where('renew_comment', 'due_payment')
+        ->order_by('data_insert_time', 'asc')
+        ->get('renew')->result();
 
         $print_text = $this->db->where('print_text_id', '1')->get('print_text')->row();
     ?>
@@ -272,12 +276,19 @@
                 ->get('room')->row();
             ?>
             <tr>
+                <?php
+                $detail_due_paid = $this->db->select_sum('rent', 'amount')
+                    ->where('checkin_details_id', $checkin_detail->checkin_details_id)
+                    ->where('renew_comment', 'due_payment')
+                    ->get('renew')->row();
+                $remaining_due = (float) $checkin_detail->due - (float) ($detail_due_paid->amount ?? 0);
+                ?>
                 <td><?php echo $checkin_detail->day_or_month_or_year ?></td>
                 <td><?php echo $room->room_no_in_english ?></td>
                 <td><?php echo date('d-m-Y', strtotime($checkin_detail->dateOfEntry)) ?></td>
                 <td><?php echo date('d-m-Y', strtotime($checkin_detail->dateOfExit)) ?></td>
                 <td><?php echo $checkin_detail->rent ?></td>
-                <td><?php echo $checkin_detail->due ?></td>
+                <td><?php echo number_format(max(0, $remaining_due), 2) ?></td>
                 <td><?php echo $checkin_detail->cash_or_credit ?></td>
                 <td><?php echo $checkin_detail->insurance ?></td>
             </tr>
@@ -294,7 +305,20 @@
       
 
     </table>
-    </table>
+    <?php if (count($due_payments) > 0) { ?>
+        <table border="1" style="border-collapse: collapse;width: 97%;margin: 5px auto;">
+            <tr><th colspan="4">Due Payment History</th></tr>
+            <tr><th>Date</th><th>Amount</th><th>Method</th><th>Remaining Due</th></tr>
+            <?php foreach ($due_payments as $payment) { ?>
+                <tr>
+                    <td><?php echo date('d-m-Y H:i', strtotime($payment->data_insert_time)); ?></td>
+                    <td><?php echo number_format((float) $payment->rent, 2); ?></td>
+                    <td><?php echo htmlspecialchars($payment->cash_or_credit, ENT_QUOTES, 'UTF-8'); ?></td>
+                    <td><?php echo number_format((float) $payment->due, 2); ?></td>
+                </tr>
+            <?php } ?>
+        </table>
+    <?php } ?>
     <table border="1" style="border-collapse: collapse;width: 97%;margin: 0 auto;margin-top: 5px;">
         <tr>
             <td colspan="2" class="td_color" colspan="2"
