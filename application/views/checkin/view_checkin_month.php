@@ -128,7 +128,7 @@ $hotel_id = $this->session->userdata('hotel_id');
                                             }
                                             ?></option>
                                         <?php
-                                        $checkins = $this->db->where('is_deleted', '0')->get('checkin')->result();
+                                        $checkins = $this->db->select('guest_unique_id')->where('is_deleted', '0')->get('checkin')->result();
 
                                         foreach ($checkins as $checkin) {
                                             ?>
@@ -421,12 +421,7 @@ $hotel_id = $this->session->userdata('hotel_id');
                             $profession_id = $result[$i]->profession_id;
                             $country_id = $result[$i]->country_id;
                             $room_id = $result[$i]->room_id;
-                            $profession = $this->db->where('profession_id', $profession_id)->get('profession')->row();
-                            $country = $this->db->where('country_id', $country_id)->get('countries')->row();
-
                             $hotel_id = $result[$i]->hotel_id;
-                            $hotel = $this->db->where('hotel_id', $hotel_id)->get('hotel')->row();
-                            $room = $this->db->where('room_id', $room_id)->get('room')->row();
                             ?>
                             <tr>
                                 <td><?php echo $sl++ ?></td>
@@ -435,9 +430,9 @@ $hotel_id = $this->session->userdata('hotel_id');
                                 <td>
                                     <?php
                                     if ($language == 'english') {
-                                        echo $country->country_enName;
+                                        echo $result[$i]->country_enName;
                                     } else {
-                                        echo $country->country_arName;
+                                        echo $result[$i]->country_arName;
                                     }
                                     ?>
                                     <?php
@@ -449,9 +444,9 @@ $hotel_id = $this->session->userdata('hotel_id');
                                     ?></td>
                                 <td><?php
                                     if ($language == 'english') {
-                                        echo $room->room_no_in_english;
+                                            echo $result[$i]->room_no_in_english;
                                     } else {
-                                        echo $room->room_no_in_arabic;
+                                            echo $result[$i]->room_no_in_arabic;
                                     }
                                     ?></td>
                                 <td><?php echo date('d-m-Y', strtotime($result[$i]->dateOfEntry)) ?></td>

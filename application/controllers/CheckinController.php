@@ -1510,67 +1510,67 @@ class CheckinController extends CI_Controller
             $this->db->where('checkin_details.hotel_id', $hotel_id);
             $this->db->where('checkin_details.dateOfEntry>=', $from_date);
             $this->db->where('checkin_details.dateOfEntry<=', $to_date);
-            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
+            $config['total_rows'] = $this->db->count_all_results('checkin_details');
             // print_r('1');
         } else if ($room_id == '' && $hotel_id != '' && $from_date != '' && $to_date != '') {
             $this->db->where('checkin_details.hotel_id', $hotel_id);
             $this->db->where('checkin_details.dateOfEntry >=', $from_date);
             $this->db->where('checkin_details.dateOfEntry <=', $to_date);
-            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
+            $config['total_rows'] = $this->db->count_all_results('checkin_details');
         } else if ($room_id != '' && $hotel_id != '' && $from_date != '' && $to_date == '') {
             $this->db->where('checkin_details.room_id', $room_id);
             $this->db->where('checkin_details.hotel_id', $hotel_id);
             $this->db->where('checkin_details.dateOfEntry>=', $from_date);
             $this->db->where('checkin_details.dateOfEntry<=', $from_date);
-            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
+            $config['total_rows'] = $this->db->count_all_results('checkin_details');
             //  print_r('2');
         } else if ($room_id != '' && $hotel_id != '' && $from_date == '' && $to_date != '') {
             $this->db->where('checkin_details.room_id', $room_id);
             $this->db->where('checkin_details.hotel_id', $hotel_id);
             $this->db->where('checkin_details.dateOfEntry>=', $to_date);
             $this->db->where('checkin_details.dateOfEntry<=', $to_date);
-            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
+            $config['total_rows'] = $this->db->count_all_results('checkin_details');
             //  print_r('2');
         }
         else if ($room_id == '' && $hotel_id != '' && $from_date == '' && $to_date == '') {
             $this->db->where('checkin_details.hotel_id', $hotel_id);
-            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
+            $config['total_rows'] = $this->db->count_all_results('checkin_details');
             // print_r('3');
             //  print_r('<br>'.$config['total_rows']);
         } else if ($room_id == '' && $hotel_id == '' && $from_date != '' && $to_date != '') {
             $this->db->where('checkin_details.dateOfEntry>=', $from_date);
             $this->db->where('checkin_details.dateOfEntry<=', $to_date);
-            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
+            $config['total_rows'] = $this->db->count_all_results('checkin_details');
             //print_r('4');
         } else if ($room_id == '' && $hotel_id == '' && $from_date != '' && $to_date == '') {
             $this->db->where('checkin_details.dateOfEntry>=', $from_date);
             $this->db->where('checkin_details.dateOfEntry<=', $from_date);
-            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
+            $config['total_rows'] = $this->db->count_all_results('checkin_details');
             // print_r('5');
         } else if ($room_id == '' && $hotel_id != '' && $from_date != '' && $to_date == '') {
             $this->db->where('checkin_details.dateOfEntry>=', $from_date);
             $this->db->where('checkin_details.dateOfEntry<=', $from_date);
             $this->db->where('checkin_details.hotel_id', $hotel_id);
-            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
+            $config['total_rows'] = $this->db->count_all_results('checkin_details');
             // print_r('5');
         }else if ($room_id == '' && $hotel_id != '' && $from_date == '' && $to_date != '') {
             $this->db->where('checkin_details.dateOfEntry>=', $to_date);
             $this->db->where('checkin_details.dateOfEntry<=', $to_date);
             $this->db->where('checkin_details.hotel_id', $hotel_id);
-            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
+            $config['total_rows'] = $this->db->count_all_results('checkin_details');
             //print_r('6');
         }
         else if ($room_id == '' && $hotel_id == '' && $from_date == '' && $to_date != '') {
             $this->db->where('checkin_details.dateOfEntry>=', $to_date);
             $this->db->where('checkin_details.dateOfEntry<=', $to_date);
-            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
+            $config['total_rows'] = $this->db->count_all_results('checkin_details');
         } else if ($room_id != '' && $hotel_id != '' && $from_date == '' && $to_date == '') {
             $this->db->where('checkin_details.room_id', $room_id);
             $this->db->where('checkin_details.hotel_id', $hotel_id);
-            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
+            $config['total_rows'] = $this->db->count_all_results('checkin_details');
             // print_r('7');
         } else if ($room_id == '' && $hotel_id == '' && $from_date == '' && $to_date == '') {
-            $config['total_rows'] = $this->db->get('checkin_details')->num_rows();
+            $config['total_rows'] = $this->db->count_all_results('checkin_details');
             // print_r('8');
         }
 

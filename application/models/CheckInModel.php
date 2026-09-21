@@ -15,7 +15,7 @@ class CheckInModel extends CI_Model {
     public function get_all_checkin_month($limit, $start,  $hotel_id, $from_date, $to_date,$guest_unique_id,$room_id)
     {
         $user_type = $this->session->userdata('type');
-        $this->db->select('*');
+        $this->db->select('checkin_details.*, checkin.*, countries.country_enName, countries.country_arName, hotel.hotel_name_in_english, hotel.hotel_name_in_arabic, room.room_no_in_english, room.room_no_in_arabic');
         $this->db->limit($limit, $start);
         $this->db->where('checkin.is_deleted', '0');
 
@@ -57,6 +57,9 @@ class CheckInModel extends CI_Model {
             $this->db->where('checkin.guest_unique_id', $guest_unique_id);
         }
         $this->db->join('checkin', 'checkin.checkin_id  = checkin_details.checkin_id');
+        $this->db->join('countries', 'countries.country_id = checkin.country_id', 'left');
+        $this->db->join('hotel', 'hotel.hotel_id = checkin_details.hotel_id', 'left');
+        $this->db->join('room', 'room.room_id = checkin_details.room_id', 'left');
         $this->db->where('checkin.day_or_month', 'month');
         $this->db->order_by('checkin.checkin_id', 'desc');
         $query = $this->db->get("checkin_details");
@@ -96,18 +99,20 @@ class CheckInModel extends CI_Model {
         $this->db->where('checkin_details.is_deleted', '0');
         $this->db->where('checkin_details.day_or_month', 'day');
         $this->apply_checkin_day_list_filters($hotel_id, $room_id, $from_date, $to_date);
-        $q = $this->db->get();
-        return (int) $q->num_rows();
+        return (int) $this->db->count_all_results();
     }
 
     public function get_all_checkin_day($limit, $start,  $hotel_id, $from_date, $to_date,$guest_unique_id,$room_id)
     {
-        $this->db->select('*');
+        $this->db->select('checkin_details.*, checkin.*, countries.country_enName, countries.country_arName, hotel.hotel_name_in_english, hotel.hotel_name_in_arabic, room.room_no_in_english, room.room_no_in_arabic');
         $this->db->from('checkin_details');
         $this->db->where('checkin_details.is_deleted', '0');
         $this->apply_checkin_day_list_filters($hotel_id, $room_id, $from_date, $to_date);
         $this->db->where('checkin_details.day_or_month', 'day');
         $this->db->join('checkin', 'checkin.checkin_id  = checkin_details.checkin_id');
+        $this->db->join('countries', 'countries.country_id = checkin.country_id', 'left');
+        $this->db->join('hotel', 'hotel.hotel_id = checkin_details.hotel_id', 'left');
+        $this->db->join('room', 'room.room_id = checkin_details.room_id', 'left');
         if ($guest_unique_id != '') {
             $this->db->where('checkin.guest_unique_id', $guest_unique_id);
         }
