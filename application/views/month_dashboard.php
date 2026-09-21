@@ -19,7 +19,7 @@
                 $rooms = $this->db->where('status', 'booked')->where('day_or_month', 'month')->where('hotel_id', $hotel->hotel_id)->order_by('room_no_in_english','ASC')->get('room')->result();
                 foreach ($rooms as $room) {
                     $checkin_details_id_for_renew = 0;
-                    $active_due_row = $this->db->select('due')
+                    $active_due_row = $this->db->select('checkin_details_id, due')
                         ->where('checkin_id', $room->checkin_id)
                         ->where('room_id', $room->room_id)
                         ->where('exit_status', 'no')
@@ -28,7 +28,13 @@
                         ->limit(1)
                         ->get('checkin_details')
                         ->row();
-                    $room_due = $active_due_row ? (float) $active_due_row->due : 0.0;
+                    $due_paid = $active_due_row ? $this->db->select_sum('rent', 'amount')
+                        ->where('checkin_details_id', $active_due_row->checkin_details_id)
+                        ->where('renew_comment', 'due_payment')
+                        ->get('renew')->row() : null;
+                    $room_due = $active_due_row
+                        ? (float) $active_due_row->due - (float) ($due_paid->amount ?? 0)
+                        : 0.0;
                     ?>
                     <div class="container-room" data-toggle="modal"
                          data-target="#exampleModal<?php echo $room->checkin_id ?>"
@@ -52,6 +58,8 @@
                                 }
                                 echo $language == 'english' ? $room_due : Convertnumber2arabic((string) $room_due);
                                 ?></p>
+                                <a style="display: block;width: 100%;font-weight: bold;color: red;text-align: center;font-size: 13px;" title="Pay Due"
+                                   href="<?php echo base_url() ?>due-payment/<?php echo $active_due_row->checkin_details_id ?>">Pay Due</a>
                                 <?php
                             }
                             ?>
