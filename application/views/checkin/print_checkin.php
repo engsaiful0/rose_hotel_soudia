@@ -17,7 +17,8 @@
             -webkit-print-color-adjust: exact !important;
         }
 
-        #report, #report * {
+        #report,
+        #report * {
             visibility: visible;
             overflow: visible;
         }
@@ -71,7 +72,7 @@
         ->where('renew_comment', 'due_payment')
         ->order_by('data_insert_time', 'asc')
         ->get('renew')->result();
-        $print_text = $this->db->where('print_text_id', '1')->get('print_text')->row();
+    $print_text = $this->db->where('print_text_id', '1')->get('print_text')->row();
 
     ?>
     <table border="1" style="border-collapse: collapse;width: 97%;margin: 0 auto;margin-top: 5px;">
@@ -83,13 +84,13 @@
             <td class="td_color" style="background-color: #0a568d;color: white">
                 <?php
                 if ($language == 'english') {
-                    ?>
+                ?>
                     Name
-                    <?php
+                <?php
                 } else {
-                    ?>
+                ?>
                     الإسم
-                    <?php
+                <?php
                 }
                 ?>
             </td>
@@ -97,13 +98,13 @@
             <td class="td_color" style="background-color: #0a568d;color: white">
                 <?php
                 if ($language == 'english') {
-                    ?>
+                ?>
                     ID Number
-                    <?php
+                <?php
                 } else {
-                    ?>
+                ?>
                     رقم البطاقة
-                    <?php
+                <?php
                 }
                 ?>
             </td>
@@ -113,13 +114,13 @@
             <td class="td_color" style="background-color: #0a568d;color: white">
                 <?php
                 if ($language == 'english') {
-                    ?>
+                ?>
                     Country
-                    <?php
+                <?php
                 } else {
-                    ?>
+                ?>
                     الجنسية
-                    <?php
+                <?php
                 }
                 ?>
             </td>
@@ -133,13 +134,13 @@
             <td class="td_color" style="background-color: #0a568d;color: white">
                 <?php
                 if ($language == 'english') {
-                    ?>
+                ?>
                     Place
-                    <?php
+                <?php
                 } else {
-                    ?>
+                ?>
                     مكان الإصدار
-                    <?php
+                <?php
                 }
                 ?>
             </td>
@@ -149,13 +150,13 @@
             <td class="td_color" style="background-color: #0a568d;color: white">
                 <?php
                 if ($language == 'english') {
-                    ?>
+                ?>
                     Birthday
-                    <?php
+                <?php
                 } else {
-                    ?>
+                ?>
                     الميلاد
-                    <?php
+                <?php
                 }
                 ?>
             </td>
@@ -163,13 +164,13 @@
             <td class="td_color" style="background-color: #0a568d;color: white">
                 <?php
                 if ($language == 'english') {
-                    ?>
+                ?>
                     Mobile
-                    <?php
+                <?php
                 } else {
-                    ?>
+                ?>
                     جوال
-                    <?php
+                <?php
                 }
                 ?>
             </td>
@@ -180,27 +181,27 @@
             <td class="td_color" style="background-color: #0a568d;color: white">
                 <?php
                 if ($language == 'english') {
-                    ?>
+                ?>
                     Profession
-                    <?php
+                <?php
                 } else {
-                    ?>
+                ?>
                     المهنة
-                    <?php
+                <?php
                 }
                 ?>
             </td>
             <td><?php echo $checkin->profession_id ?></td>
-            <td class="td_color" style="background-color: #0a568d;color: white">  <?php
-                if ($language == 'english') {
-                    ?>
+            <td class="td_color" style="background-color: #0a568d;color: white"> <?php
+                                                                                    if ($language == 'english') {
+                                                                                    ?>
                     Total
-                    <?php
-                } else {
-                    ?>
+                <?php
+                                                                                    } else {
+                ?>
                     المجموع
-                    <?php
-                }
+                <?php
+                                                                                    }
                 ?></td>
             <td><?php echo $checkin->grandRent ?></td>
         </tr>
@@ -208,8 +209,55 @@
     </table>
     <?php if (count($due_payments) > 0) { ?>
         <table border="1" style="border-collapse: collapse;width: 97%;margin: 5px auto;">
-            <tr><th colspan="4">Due Payment History</th></tr>
-            <tr><th>Date</th><th>Amount</th><th>Method</th><th>Remaining Due</th></tr>
+            <tr>
+                <th colspan="4">
+                    <?php
+                    if ($language == 'english') {
+                        echo 'Due Payment History';
+                    } else {
+                        echo 'سجل المدفوعات المستحقة';
+                    }
+                    ?>
+
+                </th>
+            </tr>
+            <tr>
+                <th>
+                    <?php
+                    if ($language == 'english') {
+                        echo 'Date';
+                    } else {
+                        echo 'تاريخ';
+                    }
+                    ?>
+                </th>
+                <th>
+                    <?php
+                    if ($language == 'english') {
+                        echo 'Amount';
+                    } else {
+                        echo 'كمية';
+                    }
+                    ?>
+                </th>
+                <th>
+                    <?php
+                    if ($language == 'english') {
+                        echo 'Method';
+                    } else {
+                        echo 'طريقة';
+                    }
+                    ?>
+                </th>
+                <th><?php
+                    if ($language == 'english') {
+                        echo 'Remaining Due';
+                    } else {
+                        echo 'المبلغ المتبقي';
+                    }
+                    ?>
+                </th>
+            </tr>
             <?php foreach ($due_payments as $payment) { ?>
                 <tr>
                     <td><?php echo date('d-m-Y H:i', strtotime($payment->data_insert_time)); ?></td>
@@ -221,7 +269,7 @@
         </table>
     <?php } ?>
     <table border="1"
-           style="border-collapse: collapse;width: 97%;margin: 0 auto;margin-top: 5px;  ">
+        style="border-collapse: collapse;width: 97%;margin: 0 auto;margin-top: 5px;  ">
         <tr class="row_color" style="background-color: #6AA42F;color: black">
             <td><?php
                 if ($language == 'english') {
@@ -259,13 +307,13 @@
                 }
                 ?></td>
             <td><?php
-                $due='';
+                $due = '';
                 if ($language == 'english') {
                     echo 'Due';
-                    $due='';
+                    $due = '';
                 } else {
                     echo 'بسبب';
-                    $due='بسبب';
+                    $due = 'بسبب';
                 }
                 ?></td>
             <td><?php
@@ -289,7 +337,7 @@
             $room = $this->db->select('*')
                 ->where('room_id', $checkin_detail->room_id)
                 ->get('room')->row();
-            ?>
+        ?>
             <tr>
                 <?php
                 $detail_due_paid = $this->db->select_sum('rent', 'amount')
@@ -307,14 +355,14 @@
                 <td><?php echo $checkin_detail->cash_or_credit ?></td>
                 <td><?php echo $checkin_detail->insurance ?></td>
             </tr>
-            <?php
+        <?php
         }
         ?>
-         <tr>
+        <tr>
             <td colspan="8" style="text-align: right">
-               <?php
-               echo $print_text->print_text_description;
-               ?>
+                <?php
+                echo $print_text->print_text_description;
+                ?>
             </td>
         </tr>
     </table>
@@ -323,26 +371,26 @@
             <td class="td_color" colspan="2" style="text-align: center;background-color: #0a568d;color: white">
                 <?php
                 if ($language == 'english') {
-                    ?>
+                ?>
                     Customer signature
-                    <?php
+                <?php
                 } else {
-                    ?>
+                ?>
                     توقيع العميل
-                    <?php
+                <?php
                 }
                 ?>
             </td>
             <td class="td_color" colspan="2" style="text-align: center;background-color: #0a568d;color: white">
                 <?php
                 if ($language == 'english') {
-                    ?>
+                ?>
                     Reception signature
-                    <?php
+                <?php
                 } else {
-                    ?>
+                ?>
                     توقيع الاستقبال
-                    <?php
+                <?php
                 }
                 ?>
 
@@ -353,13 +401,13 @@
             <td colspan="2" style="width: 320px">
                 <?php
                 if ($language == 'english') {
-                    ?>
+                ?>
                     Name
-                    <?php
+                <?php
                 } else {
-                    ?>
+                ?>
                     الإسم
-                    <?php
+                <?php
                 }
                 ?>
 
@@ -369,13 +417,13 @@
             <td colspan="2" style="width: 320px">
                 <?php
                 if ($language == 'english') {
-                    ?>
+                ?>
                     Name
-                    <?php
+                <?php
                 } else {
-                    ?>
+                ?>
                     الإسم
-                    <?php
+                <?php
                 }
                 ?>
             </td>
@@ -384,13 +432,13 @@
             <td colspan="2">
                 <?php
                 if ($language == 'english') {
-                    ?>
+                ?>
                     Signature
-                    <?php
+                <?php
                 } else {
-                    ?>
+                ?>
                     توقيع
-                    <?php
+                <?php
                 }
                 ?>
             </td>
@@ -398,13 +446,13 @@
             <td colspan="2">
                 <?php
                 if ($language == 'english') {
-                    ?>
+                ?>
                     Signature
-                    <?php
+                <?php
                 } else {
-                    ?>
+                ?>
                     توقيع
-                    <?php
+                <?php
                 }
                 ?>
             </td>
