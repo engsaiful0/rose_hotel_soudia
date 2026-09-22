@@ -66,6 +66,8 @@
                         $from = $from + 45;
                         $query = '';
                         $grand_total_other_cost=0;
+                        $from_datetime = date('Y-m-d 00:00:00', strtotime($from_date));
+                        $to_datetime = date('Y-m-d 00:00:00', strtotime($to_date . ' +1 day'));
                         if ($hotel_id!=-1) {
                             //die;
                             $this->db->select('*');
@@ -73,8 +75,8 @@
                                 ->where('checkin_details.hotel_id', $hotel_id)
                                 ->where('checkin_details.is_deleted', '0')
                                 ->where('checkin_details.day_or_month', 'month')
-                                ->where('checkin_details.dateOfEntry>=', date('Y-m-d', strtotime($from_date)))
-                                ->where('checkin_details.dateOfEntry<=', date('Y-m-d', strtotime($to_date)));
+                                ->where('checkin_details.data_insert_time >=', $from_datetime)
+                                ->where('checkin_details.data_insert_time <', $to_datetime);
                             $this->db->from('checkin_details');
                             $this->db->join('room', 'room.room_id  = checkin_details.room_id');
                             $this->db->join('checkin', 'checkin.checkin_id  = checkin_details.checkin_id');
@@ -87,8 +89,8 @@
                             $this->db
                                 ->where('checkin_details.is_deleted', '0')
                                 ->where('checkin_details.day_or_month', 'month')
-                                ->where('checkin_details.dateOfEntry>=', date('Y-m-d', strtotime($from_date)))
-                                ->where('checkin_details.dateOfEntry<=', date('Y-m-d', strtotime($to_date)));
+                                ->where('checkin_details.data_insert_time >=', $from_datetime)
+                                ->where('checkin_details.data_insert_time <', $to_datetime);
                             $this->db->from('checkin_details');
                             $this->db->join('room', 'room.room_id  = checkin_details.room_id');
                             $this->db->join('checkin', 'checkin.checkin_id  = checkin_details.checkin_id');

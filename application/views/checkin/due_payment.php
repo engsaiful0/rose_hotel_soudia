@@ -12,7 +12,7 @@
             <input type="hidden" name="checkin_details_id" value="<?php echo (int) $checkin_details->checkin_details_id; ?>">
             <div class="form-group">
                 <label for="due_payment_amount">Payment amount</label>
-                <input type="number" min="0.01" max="<?php echo htmlspecialchars($outstanding_due, ENT_QUOTES, 'UTF-8'); ?>" step="0.01" required class="form-control" id="due_payment_amount" name="amount">
+                <input type="number" min="0.01" max="<?php echo htmlspecialchars((string) $outstanding_due, ENT_QUOTES, 'UTF-8'); ?>" value="<?php echo htmlspecialchars((string) $outstanding_due, ENT_QUOTES, 'UTF-8'); ?>" step="0.01" required class="form-control" id="due_payment_amount" name="amount">
             </div>
             <div class="form-group">
                 <label for="due_payment_method">Payment method</label>
