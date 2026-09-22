@@ -158,7 +158,7 @@ include 'header.php';
                                         }
                                         ?></p>
                                     <?php
-                                    $income_cash = $this->db->select('SUM(rent - COALESCE(due, 0)) AS amount', false)
+                                    $income_cash = $this->db->select('SUM(rent) AS amount', false)
                                         ->where('cash_or_credit', 'cash')
                                         ->where('hotel_id', $hotel->hotel_id)
                                         ->where('is_deleted', 0)
@@ -219,7 +219,7 @@ include 'header.php';
                                         }
                                         ?></p>
                                     <?php
-                                    $income_credit = $this->db->select('SUM(rent - COALESCE(due, 0)) AS amount', false)
+                                    $income_credit = $this->db->select('SUM(rent) AS amount', false)
                                         ->where('cash_or_credit', 'credit')
                                         ->where('hotel_id', $hotel->hotel_id)
                                         ->where('is_deleted', 0)

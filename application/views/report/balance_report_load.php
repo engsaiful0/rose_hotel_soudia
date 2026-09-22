@@ -115,18 +115,16 @@ $date_range_label = $language == 'english'
             $cash_window_start = $cash_window['start'];
             $cash_window_end = $cash_window['end'];
 
-            $income_cash_row = $this->db->select('SUM(rent - COALESCE(due, 0)) AS amount', false)
+            $income_cash_row = $this->db->select('SUM(rent) AS amount', false)
                 ->where('cash_or_credit', 'cash')
                 ->where('hotel_id', $hotel_id)
-                ->where('is_deleted', 0)
                 ->where('data_insert_time >=', $cash_window_start)
                 ->where('data_insert_time <', $cash_window_end)
                 ->get('checkin_details')->row();
 
-            $income_credit_row = $this->db->select('SUM(rent - COALESCE(due, 0)) AS amount', false)
+            $income_credit_row = $this->db->select('SUM(rent) AS amount', false)
                 ->where('cash_or_credit', 'credit')
                 ->where('hotel_id', $hotel_id)
-                ->where('is_deleted', 0)
                 ->where('data_insert_time >=', $cash_window_start)
                 ->where('data_insert_time <', $cash_window_end)
                 ->get('checkin_details')->row();
