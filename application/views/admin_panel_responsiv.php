@@ -271,7 +271,7 @@ include 'header.php';
                                             echo 'الرصيد';
                                         }
                                         ?></p>
-                                    <p style="text-align: center;color: white"><?php echo $income_cash[0]->amount+$late[0]->amount + $income_credit[0]->amount - $expense[0]->amount; ?></p>
+                                    <p style="text-align: center;color: white"><?php echo (float) $income_cash[0]->amount+(float) $due_cash[0]->amount+(float) $late[0]->amount+(float) $income_credit[0]->amount+(float) $due_credit[0]->amount-(float) $expense[0]->amount; ?></p>
                                 </div>
 
                             </div>
