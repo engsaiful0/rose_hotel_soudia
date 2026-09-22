@@ -858,6 +858,11 @@ $hotel_id = $this->session->userdata('hotel_id');
                                                                 $hotel = $this->db->select('*')
                                                                     ->where('hotel_id', $checkin_detail->hotel_id)
                                                                     ->get('hotel')->row();
+                                                                $due_paid = $this->db->select_sum('rent', 'amount')
+                                                                    ->where('checkin_details_id', $checkin_detail->checkin_details_id)
+                                                                    ->where('renew_comment', 'due_payment')
+                                                                    ->get('renew')->row();
+                                                                $display_rent = (float) $checkin_detail->rent + (float) ($due_paid->amount ?? 0);
                                                             ?>
                                                                 <tr>
                                                                     <td><?php echo $checkin_detail->day_or_month_or_year ?></td>
@@ -865,7 +870,7 @@ $hotel_id = $this->session->userdata('hotel_id');
                                                                     <td><?php echo $room->room_no_in_english ?></td>
                                                                     <td><?php echo date('d-m-Y', strtotime($checkin_detail->dateOfEntry)) ?></td>
                                                                     <td><?php echo date('d-m-Y', strtotime($checkin_detail->dateOfExit)) ?></td>
-                                                                    <td><?php echo $checkin_detail->rent ?></td>
+                                                                    <td><?php echo $display_rent ?></td>
                                                                     <td><?php echo $checkin_detail->cash_or_credit ?></td>
                                                                     <td><?php echo $checkin_detail->insurance ?></td>
                                                                 </tr>
