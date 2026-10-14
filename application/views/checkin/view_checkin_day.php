@@ -450,7 +450,9 @@ $hotel_id = $this->session->userdata('hotel_id');
                                     $is_overdue = $result[$i]->dateOfExit <= date('Y-m-d');
                                     ?>
                                     <td<?php if ($is_overdue) { ?> style="background-color: red;color: white"<?php } ?>><?php echo date('d-m-Y', strtotime($result[$i]->dateOfExit)) ?>
-                                        <?php if ($result[$i]->room_status === 'Booked') { ?>
+                                        <?php if ($result[$i]->room_status === 'Booked'
+                                            && $result[$i]->exit_status === 'no'
+                                            && (string) $result[$i]->room_checkin_id === (string) $result[$i]->checkin_id) { ?>
                                             <a title="Exit" class="btn btn-primary" data-toggle="modal" data-target="#exitModal<?php echo $checkin_details_id ?>" href="#">
                                                 <?php echo $language == 'english' ? 'Exit' : 'مخرج'; ?>
                                             </a>
