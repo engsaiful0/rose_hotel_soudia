@@ -15,7 +15,7 @@ class CheckInModel extends CI_Model {
     public function get_all_checkin_month($limit, $start,  $hotel_id, $from_date, $to_date,$guest_unique_id,$room_id)
     {
         $user_type = $this->session->userdata('type');
-        $this->db->select('checkin_details.*, checkin.*, countries.country_enName, countries.country_arName, hotel.hotel_name_in_english, hotel.hotel_name_in_arabic, room.room_no_in_english, room.room_no_in_arabic');
+        $this->db->select('checkin_details.*, checkin.*, countries.country_enName, countries.country_arName, hotel.hotel_name_in_english, hotel.hotel_name_in_arabic, room.room_no_in_english, room.room_no_in_arabic, room.status AS room_status');
         $this->db->limit($limit, $start);
         $this->db->where('checkin.is_deleted', '0');
 
@@ -104,7 +104,7 @@ class CheckInModel extends CI_Model {
 
     public function get_all_checkin_day($limit, $start,  $hotel_id, $from_date, $to_date,$guest_unique_id,$room_id)
     {
-        $this->db->select('checkin_details.*, checkin.*, countries.country_enName, countries.country_arName, hotel.hotel_name_in_english, hotel.hotel_name_in_arabic, room.room_no_in_english, room.room_no_in_arabic');
+        $this->db->select('checkin_details.*, checkin.*, countries.country_enName, countries.country_arName, hotel.hotel_name_in_english, hotel.hotel_name_in_arabic, room.room_no_in_english, room.room_no_in_arabic, room.status AS room_status');
         $this->db->from('checkin_details');
         $this->db->where('checkin_details.is_deleted', '0');
         $this->apply_checkin_day_list_filters($hotel_id, $room_id, $from_date, $to_date);

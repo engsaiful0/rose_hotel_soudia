@@ -452,88 +452,17 @@ $hotel_id = $this->session->userdata('hotel_id');
                                 <td><?php echo date('d-m-Y', strtotime($result[$i]->dateOfEntry)) ?></td>
 
                                 <?php
-                                $data = date('Y-m-d');
-                                $time = date('H');
-                                $min = date('i');
                                 $checkin_details_id = $result[$i]->checkin_details_id;
-                                //                                print_r('$data='.$data);
-                                //                                print_r('$checkin_detail->dateOfExit='.$checkin_detail->dateOfExit.'<br>');
-                                if (($data == $result[$i]->dateOfExit && $time >= 15 && $min > 0 && $result[$i]->exit_status == 'no')||($data > $result[$i]->dateOfExit && $result[$i]->exit_status == 'no')) {
-
-                                    $data = array(
-                                        'exit_status' => 'yes'
-                                    );
-                                    $data_room = array(
-                                        'status' => 'Free'
-                                    );
-
-                                    $this->db->where('checkin_details_id', $checkin_details_id)->update('checkin_details', $data);
-                                    //$this->db->where('room_id', $room_id)->update('room', $data_room);
-                                    $this->db->where('room_id', $room_id)->where('checkin_id', $result[$i]->checkin_id)->update('room', $data_room);
-
+                                    $is_overdue = $result[$i]->dateOfExit <= date('Y-m-d');
                                     ?>
-                                    <td style="background-color: red;color: white"><?php echo date('d-m-Y', strtotime($result[$i]->dateOfExit)) ?>
-
-                                        <a title="Details" class="btn btn-primary" data-toggle="modal"
-                                           data-target="#exitModal<?php echo $checkin_details_id ?>"
-                                           href="#"> <?php
-                                            if ($language == 'english') {
-                                                echo 'Exit';
-                                            } else {
-                                                echo 'مخرج';
-                                            }
-                                            ?></a>
-
+                                    <td<?php if ($is_overdue) { ?> style="background-color: red;color: white"<?php } ?>><?php echo date('d-m-Y', strtotime($result[$i]->dateOfExit)) ?>
+                                        <?php if ($result[$i]->room_status === 'Booked') { ?>
+                                            <a title="Exit" class="btn btn-primary" data-toggle="modal" data-target="#exitModal<?php echo $checkin_details_id ?>" href="#">
+                                                <?php echo $language == 'english' ? 'Exit' : 'مخرج'; ?>
+                                            </a>
+                                        <?php } ?>
                                     </td>
-                                    <?php
-                                } else if ($result[$i]->dateOfExit < $data && $result[$i]->exit_status == 'no') {
-                                    ?>
-                                    <td style="background-color: red;color: white"><?php echo date('d-m-Y', strtotime($result[$i]->dateOfExit)) ?>
-                                        <?php
-                                        $user_type = $this->session->userdata('type');
-                                        if ($user_type == 'superadmin') {
-                                            ?>
-                                            <a title="Details" class="btn btn-primary" data-toggle="modal"
-                                               data-target="#exitModal<?php echo $checkin_details_id ?>"
-                                               href="#"> <?php
-                                                if ($language == 'english') {
-                                                    echo 'Exit';
-                                                } else {
-                                                    echo 'مخرج';
-                                                }
-                                                ?></a>
-                                            <?php
-                                        }
-                                        ?>
-                                    </td>
-                                    <?php
-                                } else if ($result[$i]->exit_status == 'no') {
-                                    ?>
-                                    <td><?php echo date('d-m-Y', strtotime($result[$i]->dateOfExit)) ?>
-
-                                        <a title="Details" class="btn btn-primary" data-toggle="modal"
-                                           data-target="#exitModal<?php echo $checkin_details_id ?>"
-                                           href="#"> <?php
-                                            if ($language == 'english') {
-                                                echo 'Exit';
-                                            } else {
-                                                echo 'مخرج';
-                                            }
-                                            ?></a>
-
-                                    </td>
-
-                                    <?php
-                                } else {
-                                    ?>
-                                    <td><?php echo date('d-m-Y', strtotime($result[$i]->dateOfExit)) ?>
-                                    </td>
-
-                                    <?php
-                                }
-
-                                ?>
-                                <div class="modal fade" id="exitModal<?php echo $checkin_details_id ?>" tabindex="-1"
+                                    <div class="modal fade" id="exitModal<?php echo $checkin_details_id ?>" tabindex="-1"
                                      role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                                     <div class="modal-dialog" role="document">
                                         <div class="modal-content">
