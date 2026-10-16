@@ -50,7 +50,7 @@ class ExpenseModel extends CI_Model
 
     private function allowed_hotel_id($requested_hotel_id)
     {
-        if (in_array($this->session->userdata('type'), array('admin', 'superadmin'), true)) {
+        if ($this->session->userdata('type') === 'superadmin') {
             return $requested_hotel_id;
         }
 

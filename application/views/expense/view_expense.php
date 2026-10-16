@@ -64,19 +64,30 @@
                         <tr>
                             <td>From Date</td>
                             <td>To Date</td>
-                            <td>
-                                <?php
-                                if ($language == 'english') {
-                                ?>
-                                    Select Hotel
-                                <?php
-                                } else {
-                                ?>
-                                    الفندق
-                                <?php
-                                }
-                                ?>
-                            </td>
+                            <?php
+                            $hotel_id = $this->session->userdata('hotel_id');
+                            // print_r('$hotel_id'.$hotel_id);
+                            //die;
+                            $hotels = '';
+                            $user_type = $this->session->userdata('type');
+                            if ($user_type == 'superadmin') {
+                            ?>
+                                <td>
+                                    <?php
+                                    if ($language == 'english') {
+                                    ?>
+                                        Select Hotel
+                                    <?php
+                                    } else {
+                                    ?>
+                                        الفندق
+                                    <?php
+                                    }
+                                    ?>
+                                </td>
+                            <?php
+                            }
+                            ?>
                             <td></td>
                         </tr>
                         <tr>
@@ -87,34 +98,51 @@
                             <td>
                                 <input id="to_date" name="to_date" class="form-control datepicker">
                             </td>
-                            <td>
-                                <select id="hotel_id" name="hotel_id" class="form-control">
-                                    <?php if ($is_admin) : ?>
-                                    <option value="">
+                            <?php
+                            $language = $this->session->userdata('language');
+                            $hotel_id = $this->session->userdata('hotel_id');
+                            $hotels = '';
+                            $user_type = $this->session->userdata('type');
+                            if ($user_type == 'superadmin') {
+                            ?>
+                                <td>
+                                    <select id="hotel_id" name="hotel_id" class="form-control">
+
+                                        <option value="">
+                                            <?php
+                                            if ($language == 'english') {
+                                            ?>
+                                                Select Hotel
+                                            <?php
+                                            } else {
+                                            ?>
+                                                الفندق
+                                            <?php
+                                            }
+                                            ?>
+                                        </option>
                                         <?php
-                                        if ($language == 'english') {
-                                        ?>
-                                            Select Hotel
-                                        <?php
+                                        if ($user_type == 'superadmin') {
+                                            $hotels = $this->db->select('*')->get('hotel')->result();
                                         } else {
+                                            $hotels = $this->db->where('hotel_id', $hotel_id)->get('hotel')->result();
+                                        }
+
+                                        foreach ($hotels as $hotel) {
                                         ?>
-                                            الفندق
+                                            <option value="<?php echo $hotel->hotel_id ?>"><?php echo $hotel->hotel_name_in_english ?></option>
                                         <?php
                                         }
                                         ?>
-                                    </option>
-                                    <?php endif; ?>
-                                    <?php
-                                    $language = $this->session->userdata('language');
+                                    </select>
+                                </td>
+                            <?php
+                            } else {
+                            }
 
-                                    foreach ($hotels as $hotel) {
-                                    ?>
-                                        <option <?php echo (string) $selected_hotel_id === (string) $hotel->hotel_id ? 'selected' : ''; ?> value="<?php echo $hotel->hotel_id ?>"><?php echo $hotel->hotel_name_in_english ?></option>
-                                    <?php
-                                    }
-                                    ?>
-                                </select>
-                            </td>
+                            ?>
+
+
                             <td><input type="submit" value="Submit" class="btn btn-primary"></td>
                         </tr>
 
@@ -135,9 +163,9 @@
                                 ?>
                                     <th>Edit</th>
                                     <th>Delete</th>
-                        <?php
+                                <?php
                                 endif
-                        ?>
+                                ?>
                             </tr>
                         </thead>
                         <tbody>
