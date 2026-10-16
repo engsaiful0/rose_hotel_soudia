@@ -89,6 +89,7 @@
                             </td>
                             <td>
                                 <select id="hotel_id" name="hotel_id" class="form-control">
+                                    <?php if ($is_admin) : ?>
                                     <option value="">
                                         <?php
                                         if ($language == 'english') {
@@ -102,13 +103,13 @@
                                         }
                                         ?>
                                     </option>
+                                    <?php endif; ?>
                                     <?php
                                     $language = $this->session->userdata('language');
-                                    $hotels = $this->db->select('*')->get('hotel')->result();
 
                                     foreach ($hotels as $hotel) {
                                     ?>
-                                        <option <?php $transaction->hotel_id == $hotel->hotel_id ? "selected" : "" ?> value="<?php echo $hotel->hotel_id ?>"><?php echo $hotel->hotel_name_in_english ?></option>
+                                        <option <?php echo (string) $selected_hotel_id === (string) $hotel->hotel_id ? 'selected' : ''; ?> value="<?php echo $hotel->hotel_id ?>"><?php echo $hotel->hotel_name_in_english ?></option>
                                     <?php
                                     }
                                     ?>
@@ -134,10 +135,10 @@
                                 ?>
                                     <th>Edit</th>
                                     <th>Delete</th>
-                            </tr>
                         <?php
                                 endif
                         ?>
+                            </tr>
                         </thead>
                         <tbody>
                             <?php

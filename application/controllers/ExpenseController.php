@@ -79,6 +79,16 @@ class ExpenseController extends CI_Controller
         $to_date = $this->input->post('to_date');
         $hotel_id = $this->input->post('hotel_id');
 
+        $is_admin = in_array($this->session->userdata('type'), array('admin', 'superadmin'), true);
+        if (!$is_admin) {
+            $assigned_hotel_id = (int) $this->session->userdata('hotel_id');
+            $hotel_id = $assigned_hotel_id > 0 ? $assigned_hotel_id : -1;
+            $this->db->where('hotel_id', $hotel_id);
+        }
+        $data['hotels'] = $this->db->get('hotel')->result();
+        $data['selected_hotel_id'] = $hotel_id;
+        $data['is_admin'] = $is_admin;
+
         $page = ($this->uri->segment(3)) ? $this->uri->segment(3) : 0;
         $config['base_url'] = base_url() . "index.php/ExpenseController/view_expense";
         $config['total_rows'] =  $this->ExpenseModel->count_all_expense($from_date, $to_date, $hotel_id);

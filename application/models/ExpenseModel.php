@@ -9,6 +9,7 @@ class ExpenseModel extends CI_Model
 
     public function get_expense($limit, $offset, $from_date = '', $to_date = '', $hotel_id = '')
     {
+        $hotel_id = $this->allowed_hotel_id($hotel_id);
         $this->db->order_by('expense_id', 'DESC');
         
         if (!empty($hotel_id)) {
@@ -29,6 +30,7 @@ class ExpenseModel extends CI_Model
 
     public function count_all_expense($from_date = '', $to_date = '', $hotel_id = '')
     {
+        $hotel_id = $this->allowed_hotel_id($hotel_id);
       
         if (!empty($hotel_id)) {
             $this->db->where('hotel_id', $hotel_id);
@@ -44,5 +46,16 @@ class ExpenseModel extends CI_Model
         }
 
         return $this->db->count_all_results('expense');
+    }
+
+    private function allowed_hotel_id($requested_hotel_id)
+    {
+        if (in_array($this->session->userdata('type'), array('admin', 'superadmin'), true)) {
+            return $requested_hotel_id;
+        }
+
+        // Never allow an unassigned hotel user to fall back to all expenses.
+        $hotel_id = (int) $this->session->userdata('hotel_id');
+        return $hotel_id > 0 ? $hotel_id : -1;
     }
 }
